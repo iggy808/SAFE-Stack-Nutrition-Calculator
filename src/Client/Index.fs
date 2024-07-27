@@ -39,7 +39,7 @@ let update msg model =
         | Start todoText ->
             let saveTodoCmd =
                 let todo = Todo.create todoText
-                Cmd.OfAsync.perform nutritionApi.createDailyTargets (DailyTargets.create DateTime.Now) (Finished >> SaveTodo)
+                Cmd.OfAsync.perform nutritionApi.createDailyTargets (DailyTargets.create (DateOnly.FromDateTime(DateTime.Now))) (Finished >> SaveTodo)
 
             { model with Input = "" }, saveTodoCmd
         | Finished DailyTargets ->

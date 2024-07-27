@@ -2,13 +2,13 @@ namespace Records
 open System
 
 [<CLIMutable>]
-type DailyTargets = { Id: Guid; Date: DateTime; }
+type DailyTargets = { Id: Guid; Date: DateOnly; }
 
 module DailyTargets =
-    let isValid (date: DateTime) =
+    let isValid (date: DateOnly) =
         true
 
-    let create (date: DateTime) = {
+    let create (date: DateOnly) = {
         Id = Guid.NewGuid()
         Date = date
     }
