@@ -117,43 +117,95 @@ let view model dispatch =
 
         prop.children [
             Html.div [
+                prop.id "title-container"
+                prop.className "my-[25px]"
                 prop.children [
                      Html.h1 [
-                        prop.className "text-center text-5xl font-bold mb-3 rounded-md p-4"
-                        prop.text "NutritionCalculator"
+                        prop.className "text-center text-5xl font-bold p-4"
+                        prop.text "Nutrition Calculator"
                         prop.style [ style.color "#16302B" ]
                     ]
                 ]
             ]
             Html.div [
-                prop.className "mx-[100px] mt-[10px]"
+                prop.id "nav-bar-container"
+                prop.className "mx-[75px] mt-[10px] mb-[20px] flex flex-row flex-nowrap justify-stretch h-8"
                 prop.style [
                     style.border (length.px 1, borderStyle.solid, "black")
                 ]
-                prop.text "top bar"
+                prop.children [
+                    Html.div [
+                        prop.className "grow flex items-center justify-center"
+                        prop.style [
+                            style.border (length.px 1, borderStyle.solid, "black")
+                            style.backgroundColor "#A38F8F"
+                            style.textAlign.center
+                        ]
+                        prop.children [
+                            Html.a [
+                                prop.text "Area 1"
+                                prop.href "#"
+                            ]
+                        ]
+                    ]
+                    Html.div [
+                        prop.className "grow flex items-center justify-center"
+                        prop.style [
+                            style.border (length.px 1, borderStyle.solid, "black")
+                            style.backgroundColor "#A38F8F"
+                            style.textAlign.center
+                        ]
+                        prop.children [
+                            Html.a [
+                                prop.text "Area 2"
+                                prop.href "#"
+                            ]
+                        ]
+                    ]
+                    Html.div [
+                        prop.className "grow flex items-center justify-center"
+                        prop.style [
+                            style.border (length.px 1, borderStyle.solid, "black")
+                            style.backgroundColor "#A38F8F"
+                            style.textAlign.center
+                        ]
+                        prop.children [
+                            Html.a [
+                                prop.text "Area 3"
+                                prop.href "#"
+                            ]
+                        ]
+                    ]
+                ]
             ]
             Html.div [
-                prop.className "mx-[100px] mb-[75px] mt-[10px]"
+                prop.id "dashboard-container"
+                prop.className "mx-[75px] mb-[50px] flex flex-col"
                 prop.style [
                     style.flexGrow 1
                     style.border (length.px 1, borderStyle.solid, "black")
                 ]
                 prop.children [
                     Html.div [
+                        prop.id "dashboard-grid"
                         prop.className "grid grid-cols-3 grid-rows-3 gap-4"
+                        prop.style [
+                            style.flexGrow 1
+                        ]
                         prop.children [
                             Html.div [
+                                prop.id "personal-information-container"
                                 prop.className "flex items-center justify-center"
-                                prop.style [style.backgroundColor "gray"]
+                                prop.style [style.backgroundColor "#85B79D"]
                                 prop.children [
                                     Html.p [
-                                        prop.text 1
+                                        prop.text "Personal Information Container"
                                     ]
                                 ]
                             ]
                             Html.div [
                                 prop.className "flex items-center justify-center"
-                                prop.style [style.backgroundColor "gray"]
+                                prop.style [style.backgroundColor "#85B79D"]
                                 prop.children [
                                     Html.p [
                                         prop.text 2
@@ -162,7 +214,7 @@ let view model dispatch =
                             ]
                             Html.div [
                                 prop.className "flex items-center justify-center"
-                                prop.style [style.backgroundColor "gray"]
+                                prop.style [style.backgroundColor "#85B79D"]
                                 prop.children [
                                     Html.p [
                                         prop.text 3
@@ -170,27 +222,60 @@ let view model dispatch =
                                 ]
                             ]
                             Html.div [
-                                prop.text 4
+                                prop.id "daily-targets-container"
+                                prop.className "flex items-center justify-center row-start-2 row-end-4 "
+                                prop.style [style.backgroundColor "#85B79D"]
+                                prop.children [
+                                    Html.p [
+                                        prop.text "Daily Targets Container"
+                                    ]
+                                ]
                             ]
                             Html.div [
-                                prop.className "justify-self-auto"
-                                prop.text 5
+                                prop.className "flex items-center justify-center"
+                                prop.style [style.backgroundColor "#85B79D"]
+                                prop.children [
+                                    Html.p [
+                                        prop.text 5
+                                    ]
+                                ]
                             ]
                             Html.div [
-                                prop.className "justify-self-auto"
-                                prop.text 6
+                                prop.className "flex items-center justify-center"
+                                prop.style [style.backgroundColor "#85B79D"]
+                                prop.children [
+                                    Html.p [
+                                        prop.text 6
+                                    ]
+                                ]
+                            ]
+                            (*
+                            Html.div [
+                                prop.className "flex items-center justify-center"
+                                prop.style [style.backgroundColor "#85B79D"]
+                                prop.children [
+                                    Html.p [
+                                        prop.text 7
+                                    ]
+                                ]
+                            ]*)
+                            Html.div [
+                                prop.className "flex items-center justify-center"
+                                prop.style [style.backgroundColor "#85B79D"]
+                                prop.children [
+                                    Html.p [
+                                        prop.text 8
+                                    ]
+                                ]
                             ]
                             Html.div [
-                                prop.className "justify-self-auto"
-                                prop.text 7
-                            ]
-                            Html.div [
-                                prop.className "justify-self-auto"
-                                prop.text 8
-                            ]
-                            Html.div [
-                                prop.className "justify-self-auto"
-                                prop.text 9
+                                prop.className "flex items-center justify-center"
+                                prop.style [style.backgroundColor "#85B79D"]
+                                prop.children [
+                                    Html.p [
+                                        prop.text 9
+                                    ]
+                                ]
                             ]
                         ]
                     ]
