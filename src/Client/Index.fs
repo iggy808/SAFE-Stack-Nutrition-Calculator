@@ -150,10 +150,98 @@ module ViewComponents =
             ]
         ]
 
+    let personalInformationWidget model dispatch =
+        Html.div [
+            prop.id "personal-information-widget"
+            prop.className "m-[10px] grow flex flex-col"
+            prop.style [
+                style.border (length.px 1, borderStyle.solid, "transparent")
+                style.borderRadius (length.px 10)
+                style.backgroundColor "#85B79D"
+            ]
+            prop.children [
+                Html.h2 [
+                    prop.id "personal-information-greeting"
+                    prop.className "text-3xl font-bold p-4"
+                    prop.text ("Hello, " + "Evan" + "!")
+                    prop.style [
+                        style.color "#16302B"
+                        style.borderBottom (length.px 1, borderStyle.solid, "#16302B")
+                    ]
+                ]
+                Html.div [
+                    prop.id "personal-information-details"
+                    prop.className "mx-4 mt-4 grow flex flex-col"
+                    prop.style [
+                        //style.border (length.px 1, borderStyle.solid, "black")
+                    ]
+                    prop.children [
+                        Html.div [
+                            prop.className "grow"
+                            prop.children [
+                                Html.label [
+                                    prop.style [style.color "#16302B"]
+                                    prop.className "text-xl font-bold"
+                                    prop.text "Age: "
+                                ]
+                                Html.label [
+                                    prop.className "text-xl"
+                                    prop.text 23
+                                ]
+                            ]
+
+                        ]
+                        Html.div [
+                            prop.className "grow"
+                            prop.children [
+                                Html.label [
+                                    prop.style [style.color "#16302B"]
+                                    prop.className "text-xl font-bold"
+                                    prop.text "Height (in inches): "
+                                ]
+                                Html.label [
+                                    prop.className "text-xl"
+                                    prop.text 71
+                                ]
+                            ]
+                        ]
+                        Html.div [
+                            prop.className "grow"
+                            prop.children [
+                                Html.label [
+                                    prop.style [style.color "#16302B"]
+                                    prop.className "text-xl font-bold"
+                                    prop.text "Weight (in pounds): "
+                                ]
+                                Html.label [
+                                    prop.className "text-xl"
+                                    prop.text 270
+                                ]
+                            ]
+                        ]
+                        Html.div [
+                            prop.className "grow"
+                            prop.children [
+                                Html.label [
+                                    prop.style [style.color "#16302B"]
+                                    prop.className "text-xl font-bold"
+                                    prop.text "Activity Factor: "
+                                ]
+                                Html.label [
+                                    prop.className "text-xl"
+                                    prop.text 1.3
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]
+
     let dailyTargetsWidget model dispatch =
         Html.div [
             prop.id "daily-targets-widget"
-            prop.className "m-[10px] flex flex-col grow"
+            prop.className "m-[10px] grow flex flex-col"
             prop.style [
                 style.border (length.px 1, borderStyle.solid, "transparent")
                 style.borderRadius (length.px 10)
@@ -307,12 +395,9 @@ let view model dispatch =
                         prop.children [
                             Html.div [
                                 prop.id "personal-information-container"
-                                prop.className "flex items-center justify-center"
-                                prop.style [style.backgroundColor "#85B79D"]
+                                prop.className "flex flex-col"
                                 prop.children [
-                                    Html.p [
-                                        prop.text "Personal Information Container"
-                                    ]
+                                    ViewComponents.personalInformationWidget model dispatch
                                 ]
                             ]
                             Html.div [
