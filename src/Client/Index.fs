@@ -8,7 +8,7 @@ open Records
 open Browser.CssExtensions
 
 type Model = {
-    UserInformation: RemoteData<User>
+    UserInformation: RemoteData<User list>
     Targets: RemoteData<Targets list>
     Input: string
 }
@@ -17,7 +17,7 @@ type Msg =
     | SetInput of string
     | LoadDailyTargets of ApiCall<unit, Targets list>
     | SaveTodo of ApiCall<string, Targets>
-    | LoadUserInformation of ApiCall<unit, User>
+    | LoadUserInformation of ApiCall<unit, User list>
 
 let nutritionApi = Api.makeProxy<INutritionApi> ()
 
@@ -417,7 +417,7 @@ module ViewComponents =
             ]
         ]
 
-let view model dispatch =
+let view (model: Model) dispatch =
     Html.div [
         prop.className "h-screen w-screen flex flex-col"
         prop.style [
@@ -429,13 +429,12 @@ let view model dispatch =
 
         prop.children [
             ViewComponents.userInformationFormModal model dispatch
-            Html.button [
-                prop.id "testbutton"
-                prop.text "nice"
-                prop.onClick (fun _ ->
-                    (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "block"
-                )
-            ]
+            match model.UserInformation with
+                | NotStarted -> ()
+                | Loading -> ()
+                | Loaded userInformation ->
+                    if userInformation.Length = 0
+                    then (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "block"
             Html.div [
                 prop.id "title-container"
                 prop.className "my-[25px]"

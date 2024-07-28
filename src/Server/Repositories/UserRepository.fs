@@ -6,4 +6,4 @@ open System.Linq
 type UserRepository (context: Context) =
 
     member _.GetUser () =
-        context.Users.FindAll().FirstOrDefault()
+        context.Users.FindAll() |> List.ofSeq
