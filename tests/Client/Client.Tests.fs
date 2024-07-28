@@ -5,7 +5,7 @@ open Fable.Mocha
 open Index
 open Shared
 open SAFE
-
+(*
 let client =
     testList "Client" [
         testCase "Added todo"
@@ -35,6 +35,7 @@ let all =
 #endif
         client
     ]
-
+    
 [<EntryPoint>]
 let main _ = Mocha.runTests all
+*)

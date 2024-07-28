@@ -7,14 +7,14 @@ open System
 open Records
 
 type Model = {
-    DailyTargets: RemoteData<DailyTargets list>
+    DailyTargets: RemoteData<Targets list>
     Input: string
 }
 
 type Msg =
     | SetInput of string
-    | LoadDailyTargets of ApiCall<unit, DailyTargets list>
-    | SaveTodo of ApiCall<string, DailyTargets>
+    | LoadDailyTargets of ApiCall<unit, Targets list>
+    | SaveTodo of ApiCall<string, Targets>
 
 let nutritionApi = Api.makeProxy<INutritionApi> ()
 
@@ -39,7 +39,7 @@ let update msg model =
         | Start todoText ->
             let saveTodoCmd =
                 let todo = Todo.create todoText
-                Cmd.OfAsync.perform nutritionApi.createDailyTargets (DailyTargets.create (DateOnly.FromDateTime(DateTime.Now))) (Finished >> SaveTodo)
+                Cmd.OfAsync.perform nutritionApi.createDailyTargets (Targets.create (DateOnly.FromDateTime(DateTime.Now))) (Finished >> SaveTodo)
 
             { model with Input = "" }, saveTodoCmd
         | Finished DailyTargets ->
@@ -97,11 +97,173 @@ module ViewComponents =
             ]
         ]
 
-    let dailyTargetsSidebar model dispatch =
+    let navBarWidget model dispatch =
         Html.div [
+            prop.id "nav-bar-container"
+            prop.className "mx-[75px] mt-[10px] mb-[20px] flex flex-row flex-nowrap justify-stretch h-8"
             prop.style [
-                style.borderWidth 1
-                style.borderColor "black"
+                //style.border (length.px 1, borderStyle.solid, "black")
+            ]
+            prop.children [
+                Html.div [
+                    prop.className "grow flex items-center justify-center"
+                    prop.style [
+                        //style.border (length.px 1, borderStyle.solid, "black")
+                        style.backgroundColor "#A38F8F"
+                        style.textAlign.center
+                    ]
+                    prop.children [
+                        Html.a [
+                            prop.text "Area 1"
+                            prop.href "#"
+                        ]
+                    ]
+                ]
+                Html.div [
+                    prop.className "grow flex items-center justify-center"
+                    prop.style [
+                        //style.border (length.px 1, borderStyle.solid, "black")
+                        style.backgroundColor "#A38F8F"
+                        style.textAlign.center
+                    ]
+                    prop.children [
+                        Html.a [
+                            prop.text "Area 2"
+                            prop.href "#"
+                        ]
+                    ]
+                ]
+                Html.div [
+                    prop.className "grow flex items-center justify-center"
+                    prop.style [
+                        //style.border (length.px 1, borderStyle.solid, "black")
+                        style.backgroundColor "#A38F8F"
+                        style.textAlign.center
+                    ]
+                    prop.children [
+                        Html.a [
+                            prop.text "Area 3"
+                            prop.href "#"
+                        ]
+                    ]
+                ]
+            ]
+        ]
+
+    let dailyTargetsWidget model dispatch =
+        Html.div [
+            prop.id "daily-targets-widget"
+            prop.className "m-[10px] flex flex-col grow"
+            prop.style [
+                style.border (length.px 1, borderStyle.solid, "transparent")
+                style.borderRadius (length.px 10)
+                style.backgroundColor "#85B79D"
+            ]
+            prop.children [
+                Html.h2 [
+                    prop.id "daily-targets-date"
+                    prop.className "text-3xl font-bold p-4"
+                    prop.text ("Targets - " + (DateOnly.FromDateTime(DateTime.Now).ToString()))
+                    prop.style [
+                        style.color "#16302B"
+                        style.borderBottom (length.px 1, borderStyle.solid, "#16302B")
+                    ]
+
+                ]
+                Html.div [
+                    prop.id "daily-targets-content"
+                    prop.className "mx-4 mt-4 flex flex-col grow"
+                    prop.children [
+                        Html.div [
+                            prop.className "grow flex flex-col"
+                            prop.style [
+                                //style.border (length.px 1, borderStyle.solid, "black")
+                            ]
+                            prop.children [
+                                Html.label [
+                                    prop.className "text-2xl basis-1/4"
+                                    prop.style [
+                                        style.color "#16302B"
+                                    ]
+                                    prop.text "Target Calories"
+                                ]
+                                Html.label [
+                                    prop.className "text-2xl basis-3/4 ml-4 mt-4"
+                                    prop.style [
+                                        style.color "#16302B"
+                                    ]
+                                    prop.text ("500000" + " calories")
+                                ]
+                            ]        
+                        ]
+                        Html.div [
+                            prop.className "grow flex flex-col"
+                            prop.style [
+                                //style.border (length.px 1, borderStyle.solid, "black")
+                            ]
+                            prop.children [
+                                Html.label [
+                                    prop.className "text-2xl basis-1/4"
+                                    prop.style [
+                                        style.color "#16302B"
+                                    ]
+                                    prop.text "Target Protein Intake"
+                                ]
+                                Html.label [
+                                    prop.className "text-2xl basis-3/4 ml-4 mt-4"
+                                    prop.style [
+                                        style.color "#16302B"
+                                    ]
+                                    prop.text ("500000" + " grams")
+                                ]
+                            ]        
+                        ]
+                        Html.div [
+                            prop.className "grow flex flex-col"
+                            prop.style [
+                                //style.border (length.px 1, borderStyle.solid, "black")
+                            ]
+                            prop.children [
+                                Html.label [
+                                    prop.className "text-2xl basis-1/4"
+                                    prop.style [
+                                        style.color "#16302B"
+                                    ]
+                                    prop.text "Target Fat Intake"
+                                ]
+                                Html.label [
+                                    prop.className "text-2xl basis-3/4 ml-4 mt-4"
+                                    prop.style [
+                                        style.color "#16302B"
+                                    ]
+                                    prop.text ("500000" + " grams")
+                                ]
+                            ]        
+                        ]
+                        Html.div [
+                            prop.className "grow flex flex-col"
+                            prop.style [
+                                //style.border (length.px 1, borderStyle.solid, "black")
+                            ]
+                            prop.children [
+                                Html.label [
+                                    prop.className "text-2xl basis-1/4"
+                                    prop.style [
+                                        style.color "#16302B"
+                                    ]
+                                    prop.text "Target Carb Intake"
+                                ]
+                                Html.label [
+                                    prop.className "text-2xl basis-3/4 ml-4 mt-4"
+                                    prop.style [
+                                        style.color "#16302B"
+                                    ]
+                                    prop.text ("500000" + " grams")
+                                ]
+                            ]        
+                        ]
+                    ]
+                ]
             ]
         ]
 
@@ -127,63 +289,13 @@ let view model dispatch =
                     ]
                 ]
             ]
-            Html.div [
-                prop.id "nav-bar-container"
-                prop.className "mx-[75px] mt-[10px] mb-[20px] flex flex-row flex-nowrap justify-stretch h-8"
-                prop.style [
-                    style.border (length.px 1, borderStyle.solid, "black")
-                ]
-                prop.children [
-                    Html.div [
-                        prop.className "grow flex items-center justify-center"
-                        prop.style [
-                            style.border (length.px 1, borderStyle.solid, "black")
-                            style.backgroundColor "#A38F8F"
-                            style.textAlign.center
-                        ]
-                        prop.children [
-                            Html.a [
-                                prop.text "Area 1"
-                                prop.href "#"
-                            ]
-                        ]
-                    ]
-                    Html.div [
-                        prop.className "grow flex items-center justify-center"
-                        prop.style [
-                            style.border (length.px 1, borderStyle.solid, "black")
-                            style.backgroundColor "#A38F8F"
-                            style.textAlign.center
-                        ]
-                        prop.children [
-                            Html.a [
-                                prop.text "Area 2"
-                                prop.href "#"
-                            ]
-                        ]
-                    ]
-                    Html.div [
-                        prop.className "grow flex items-center justify-center"
-                        prop.style [
-                            style.border (length.px 1, borderStyle.solid, "black")
-                            style.backgroundColor "#A38F8F"
-                            style.textAlign.center
-                        ]
-                        prop.children [
-                            Html.a [
-                                prop.text "Area 3"
-                                prop.href "#"
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+            ViewComponents.navBarWidget model dispatch
             Html.div [
                 prop.id "dashboard-container"
                 prop.className "mx-[75px] mb-[50px] flex flex-col"
                 prop.style [
                     style.flexGrow 1
-                    style.border (length.px 1, borderStyle.solid, "black")
+                    //style.border (length.px 1, borderStyle.solid, "black")
                 ]
                 prop.children [
                     Html.div [
@@ -223,12 +335,9 @@ let view model dispatch =
                             ]
                             Html.div [
                                 prop.id "daily-targets-container"
-                                prop.className "flex items-center justify-center row-start-2 row-end-4 "
-                                prop.style [style.backgroundColor "#85B79D"]
+                                prop.className "flex flex-col row-start-2 row-end-4 "
                                 prop.children [
-                                    Html.p [
-                                        prop.text "Daily Targets Container"
-                                    ]
+                                    ViewComponents.dailyTargetsWidget model dispatch
                                 ]
                             ]
                             Html.div [
@@ -249,16 +358,6 @@ let view model dispatch =
                                     ]
                                 ]
                             ]
-                            (*
-                            Html.div [
-                                prop.className "flex items-center justify-center"
-                                prop.style [style.backgroundColor "#85B79D"]
-                                prop.children [
-                                    Html.p [
-                                        prop.text 7
-                                    ]
-                                ]
-                            ]*)
                             Html.div [
                                 prop.className "flex items-center justify-center"
                                 prop.style [style.backgroundColor "#85B79D"]

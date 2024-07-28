@@ -4,10 +4,10 @@ open SAFE
 open Saturn
 open Shared
 open Context
-open DailyTargetsRepository
+open TargetsRepository
 
 let context = new Context()
-let dailyTargetsRepository = new DailyTargetsRepository(context);
+let dailyTargetsRepository = new TargetsRepository(context);
 
 let nutritionApi ctx = {
     getDailyTargets = fun _ -> async { return dailyTargetsRepository.GetAllDailyTargets () }

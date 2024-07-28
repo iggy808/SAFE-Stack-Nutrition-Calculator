@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Data\Context.fs" />
-    <Compile Include="Repositories\DailyTargetsRepository.fs" />
+    <Compile Include="Repositories\TargetsRepository.fs" />
     <None Include="paket.references" />
     <Compile Include="Server.fs" />
   </ItemGroup>
