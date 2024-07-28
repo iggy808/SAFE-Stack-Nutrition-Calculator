@@ -2,7 +2,10 @@ namespace Records
 open System
 
 [<CLIMutable>]
-type Targets = { Id: Guid; Date: DateOnly; }
+type Targets = {
+    Id: Guid;
+    Date: DateOnly;
+}
 
 module Targets =
     let isValid (date: DateOnly) =

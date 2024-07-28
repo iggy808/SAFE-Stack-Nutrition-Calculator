@@ -2,7 +2,6 @@ namespace Shared
 
 open System
 open Records
-open Targets
 
 [<CLIMutable>]
 type Todo = { Id: Guid; Description: string }
@@ -20,4 +19,5 @@ module Todo =
 type INutritionApi = {
     getDailyTargets: unit -> Async<Targets list>
     createDailyTargets: Targets -> Async<Targets>
+    getUser: unit -> Async<User>
 }

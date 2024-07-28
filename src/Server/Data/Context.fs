@@ -13,3 +13,4 @@ type Context () =
 
     member val todos = database.GetCollection<Todo> "todos"
     member val Targets = database.GetCollection<Targets> "Targets"
+    member val Users = database.GetCollection<User> "Users"

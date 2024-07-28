@@ -5,9 +5,11 @@ open Saturn
 open Shared
 open Context
 open TargetsRepository
+open UserRepository
 
 let context = new Context()
-let dailyTargetsRepository = new TargetsRepository(context);
+let dailyTargetsRepository = new TargetsRepository(context)
+let userRepository = new UserRepository(context)
 
 let nutritionApi ctx = {
     getDailyTargets = fun _ -> async { return dailyTargetsRepository.GetAllDailyTargets () }
@@ -17,6 +19,7 @@ let nutritionApi ctx = {
                 | Ok() -> dailyTargets
                 | Error e -> failwith e
     }
+    getUser = fun _ -> async { return userRepository.GetUser () }
 }
 
 let webApp = Api.make nutritionApi

@@ -5,9 +5,11 @@ open SAFE
 open Shared
 open System
 open Records
+open Browser.CssExtensions
 
 type Model = {
-    DailyTargets: RemoteData<Targets list>
+    UserInformation: RemoteData<User>
+    Targets: RemoteData<Targets list>
     Input: string
 }
 
@@ -15,25 +17,36 @@ type Msg =
     | SetInput of string
     | LoadDailyTargets of ApiCall<unit, Targets list>
     | SaveTodo of ApiCall<string, Targets>
+    | LoadUserInformation of ApiCall<unit, User>
 
 let nutritionApi = Api.makeProxy<INutritionApi> ()
 
 let init () =
-    let initialModel = { DailyTargets = NotStarted; Input = "" }
-    let initialCmd = LoadDailyTargets(Start()) |> Cmd.ofMsg
+    let initialModel = { UserInformation = NotStarted; Targets = NotStarted; Input = "" }
+    //let initialCmd = LoadDailyTargets(Start()) |> Cmd.ofMsg
+    let initialCmd = LoadUserInformation(Start()) |> Cmd.ofMsg
 
     initialModel, initialCmd
 
 let update msg model =
     match msg with
+    | LoadUserInformation msg ->
+        match msg with
+        | Start() ->
+            let loadUserInformation_command = Cmd.OfAsync.perform nutritionApi.getUser () (Finished >> LoadUserInformation)
+            { model with UserInformation = Loading }, loadUserInformation_command
+        | Finished userInformation ->
+            { model with UserInformation = Loaded userInformation }, Cmd.none
+
+
     | SetInput value -> { model with Input = value }, Cmd.none
     | LoadDailyTargets msg ->
         match msg with
         | Start() ->
             let loadDailyTargets_command = Cmd.OfAsync.perform nutritionApi.getDailyTargets () (Finished >> LoadDailyTargets)
 
-            { model with DailyTargets = Loading }, loadDailyTargets_command
-        | Finished dailyTargets -> { model with DailyTargets = Loaded dailyTargets }, Cmd.none
+            { model with Targets = Loading }, loadDailyTargets_command
+        | Finished dailyTargets -> { model with Targets = Loaded dailyTargets }, Cmd.none
     | SaveTodo msg ->
         match msg with
         | Start todoText ->
@@ -45,7 +58,7 @@ let update msg model =
         | Finished DailyTargets ->
             {
                 model with
-                    DailyTargets = model.DailyTargets |> RemoteData.map (fun dailyTargets -> dailyTargets @ [ DailyTargets ])
+                    Targets = model.Targets |> RemoteData.map (fun dailyTargets -> dailyTargets @ [ DailyTargets ])
             },
             Cmd.none
 
@@ -84,7 +97,7 @@ module ViewComponents =
                 Html.ol [
                     prop.className "list-decimal ml-6"
                     prop.children [
-                        match model.DailyTargets with
+                        match model.Targets with
                         | NotStarted -> Html.text "Not Started."
                         | Loading -> Html.text "Loading..."
                         | Loaded DailyTargets ->
@@ -159,6 +172,7 @@ module ViewComponents =
                 style.borderRadius (length.px 10)
                 style.backgroundColor "#85B79D"
             ]
+
             prop.children [
                 Html.h2 [
                     prop.id "personal-information-greeting"
@@ -355,6 +369,9 @@ module ViewComponents =
             ]
         ]
 
+(*let testbutton_onclick () =
+    let elem = Browser.Dom.document.getElementById "modal"*)
+
 let view model dispatch =
     Html.div [
         prop.className "h-screen w-screen flex flex-col"
@@ -366,6 +383,59 @@ let view model dispatch =
         ]
 
         prop.children [
+            Html.div [
+                prop.id "user-information-form-modal"
+                prop.className "fixed hidden insert-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
+                prop.children [
+                    Html.div [
+                        prop.className "relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
+                        prop.children [
+                            Html.div [
+                                prop.className "mt-3 text-center"
+                                prop.children [
+                                    Html.div [
+                                        prop.className "mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-purple-100"
+                                        prop.text "nice"
+                                    ]
+                                    Html.h3 [
+                                        prop.className "text-lg leading-6 font-medium text-gray-900"
+                                        prop.text "nice"
+                                    ]
+                                    Html.div [
+                                        prop.className "mt-2 px-7 py-3"
+                                        prop.children [
+                                            Html.p [
+                                                prop.className "text-sm text-gray-500"
+                                                prop.text "nice"
+                                            ]
+                                        ]
+                                    ]
+                                    Html.div [
+                                        prop.className "items-center px-4 py-3"
+                                        prop.children [
+                                            Html.button [
+                                                prop.id "nicebutton"
+                                                prop.className "px-4 py-2 bg-purple-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                                                prop.text "nice"
+                                                prop.onClick (fun _ ->
+                                                    (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "none"
+                                                )
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+            Html.button [
+                prop.id "testbutton"
+                prop.text "nice"
+                prop.onClick (fun _ ->
+                    (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "block"
+                )
+            ]
             Html.div [
                 prop.id "title-container"
                 prop.className "my-[25px]"
@@ -397,6 +467,7 @@ let view model dispatch =
                                 prop.id "personal-information-container"
                                 prop.className "flex flex-col"
                                 prop.children [
+                                    
                                     ViewComponents.personalInformationWidget model dispatch
                                 ]
                             ]
