@@ -369,8 +369,53 @@ module ViewComponents =
             ]
         ]
 
-(*let testbutton_onclick () =
-    let elem = Browser.Dom.document.getElementById "modal"*)
+    let userInformationFormModal model dispatch =
+        Html.div [
+            prop.id "user-information-form-modal"
+            prop.className "fixed hidden insert-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
+            prop.children [
+                Html.div [
+                    prop.className "relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
+                    prop.children [
+                        Html.div [
+                            prop.className "mt-3 text-center"
+                            prop.children [
+                                Html.div [
+                                    prop.className "mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-purple-100"
+                                    prop.text "nice"
+                                ]
+                                Html.h3 [
+                                    prop.className "text-lg leading-6 font-medium text-gray-900"
+                                    prop.text "nice"
+                                ]
+                                Html.div [
+                                    prop.className "mt-2 px-7 py-3"
+                                    prop.children [
+                                        Html.p [
+                                            prop.className "text-sm text-gray-500"
+                                            prop.text "nice"
+                                        ]
+                                    ]
+                                ]
+                                Html.div [
+                                    prop.className "items-center px-4 py-3"
+                                    prop.children [
+                                        Html.button [
+                                            prop.id "nicebutton"
+                                            prop.className "px-4 py-2 bg-purple-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                                            prop.text "nice"
+                                            prop.onClick (fun _ ->
+                                                (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "none"
+                                            )
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]
 
 let view model dispatch =
     Html.div [
@@ -383,52 +428,7 @@ let view model dispatch =
         ]
 
         prop.children [
-            Html.div [
-                prop.id "user-information-form-modal"
-                prop.className "fixed hidden insert-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
-                prop.children [
-                    Html.div [
-                        prop.className "relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
-                        prop.children [
-                            Html.div [
-                                prop.className "mt-3 text-center"
-                                prop.children [
-                                    Html.div [
-                                        prop.className "mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-purple-100"
-                                        prop.text "nice"
-                                    ]
-                                    Html.h3 [
-                                        prop.className "text-lg leading-6 font-medium text-gray-900"
-                                        prop.text "nice"
-                                    ]
-                                    Html.div [
-                                        prop.className "mt-2 px-7 py-3"
-                                        prop.children [
-                                            Html.p [
-                                                prop.className "text-sm text-gray-500"
-                                                prop.text "nice"
-                                            ]
-                                        ]
-                                    ]
-                                    Html.div [
-                                        prop.className "items-center px-4 py-3"
-                                        prop.children [
-                                            Html.button [
-                                                prop.id "nicebutton"
-                                                prop.className "px-4 py-2 bg-purple-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-300"
-                                                prop.text "nice"
-                                                prop.onClick (fun _ ->
-                                                    (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "none"
-                                                )
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+            ViewComponents.userInformationFormModal model dispatch
             Html.button [
                 prop.id "testbutton"
                 prop.text "nice"
