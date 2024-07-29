@@ -8,7 +8,8 @@ open Records
 open Browser.CssExtensions
 
 type Model = {
-    UserInformation: RemoteData<User list>
+    UserInformation: RemoteData<User>
+    UserInformationDto: User
     Targets: RemoteData<Targets list>
     Input: string
 }
@@ -17,26 +18,53 @@ type Msg =
     | SetInput of string
     | LoadDailyTargets of ApiCall<unit, Targets list>
     | SaveTodo of ApiCall<string, Targets>
-    | LoadUserInformation of ApiCall<unit, User list>
+    | SubmitUserInformationForm of User
+    | GetUserInformation of ApiCall<unit, User>
+    | PostUserInformation of ApiCall<User, unit>
 
 let nutritionApi = Api.makeProxy<INutritionApi> ()
 
 let init () =
-    let initialModel = { UserInformation = NotStarted; Targets = NotStarted; Input = "" }
+    let initialModel = {
+        UserInformation = NotStarted;
+        UserInformationDto = User.Default
+        Targets = NotStarted;
+        Input = "" }
     //let initialCmd = LoadDailyTargets(Start()) |> Cmd.ofMsg
-    let initialCmd = LoadUserInformation(Start()) |> Cmd.ofMsg
+    let initialCmd = GetUserInformation(Start()) |> Cmd.ofMsg
 
     initialModel, initialCmd
 
 let update msg model =
     match msg with
-    | LoadUserInformation msg ->
+    | GetUserInformation msg ->
         match msg with
         | Start() ->
-            let loadUserInformation_command = Cmd.OfAsync.perform nutritionApi.getUser () (Finished >> LoadUserInformation)
+            Browser.Dom.console.log "Get user from server started"
+            let loadUserInformation_command = Cmd.OfAsync.perform nutritionApi.getUser () (Finished >> GetUserInformation)
             { model with UserInformation = Loading }, loadUserInformation_command
+
         | Finished userInformation ->
+            Browser.Dom.console.log "User fetched from server"
+            Browser.Dom.console.log ("User Id: " + userInformation.Id.ToString() + "User Name: " + userInformation.Name)
             { model with UserInformation = Loaded userInformation }, Cmd.none
+
+    | PostUserInformation msg ->
+        match msg with
+        | Start user ->
+            Browser.Dom.console.log "Post user to server started"
+            Browser.Dom.console.log ("user info dto in update method - Pre Post: " + user.ToString())
+
+            let updateUserInformation_command = Cmd.OfAsync.perform nutritionApi.createUser user (Finished >> PostUserInformation)
+            model, updateUserInformation_command
+
+        | Finished _ ->
+            Browser.Dom.console.log "User posted to server"
+            let loadUserInformation_command = Cmd.OfAsync.perform nutritionApi.getUser () (Finished >> GetUserInformation)
+            { model with UserInformation = Loading }, loadUserInformation_command
+
+    | SubmitUserInformationForm user ->
+        { model with UserInformationDto =  user }, Cmd.none
 
 
     | SetInput value -> { model with Input = value }, Cmd.none
@@ -369,7 +397,7 @@ module ViewComponents =
             ]
         ]
 
-    let userInformationFormModal model dispatch =
+    let userInformationFormModal (model: Model) dispatch =
         Html.div [
             prop.id "user-information-form-modal"
             // Dim website when modal is visible
@@ -390,7 +418,6 @@ module ViewComponents =
                                 Html.form [
                                     prop.children [
                                         Html.div [
-                                            prop.id "form-element-name"
                                             prop.className "flex flex-col text-left text-lg my-3 mx-20"
                                             prop.children [
                                                 Html.label [
@@ -399,17 +426,21 @@ module ViewComponents =
                                                     prop.text "Name"
                                                 ]
                                                 Html.input [
+                                                    prop.id "user-information-form-element-name"
                                                     prop.className "rounded-md w-full shadow"
                                                     prop.style [
                                                         style.backgroundColor "#85B79D"
                                                         style.color "#16302B"
                                                     ]
                                                     prop.type' "text"
+                                                    prop.onChange (fun value ->
+                                                        let elem = Browser.Dom.document.getElementById "user-information-form-element-name"
+                                                        elem.setAttribute ("value", value)
+                                                    )
                                                 ]
                                             ]
                                         ]
                                         Html.div [
-                                            prop.id "form-element-age"
                                             prop.className "flex flex-col text-left text-lg my-3 mx-20"
                                             prop.children [
                                                 Html.label [
@@ -418,17 +449,21 @@ module ViewComponents =
                                                     prop.text "Age"
                                                 ]
                                                 Html.input [
+                                                    prop.id "user-information-form-element-age"
                                                     prop.className "rounded-md w-full shadow"
                                                     prop.style [
                                                         style.backgroundColor "#85B79D"
                                                         style.color "#16302B"
                                                     ]
                                                     prop.type' "number"
+                                                    prop.onChange (fun value ->
+                                                        let elem = Browser.Dom.document.getElementById "user-information-form-element-age"
+                                                        elem.setAttribute ("value", value)
+                                                    )
                                                 ]
                                             ]
                                         ]
                                         Html.div [
-                                            prop.id "form-element-height"
                                             prop.className "flex flex-col text-left text-lg my-3 mx-20"
                                             prop.children [
                                                 Html.label [
@@ -437,17 +472,21 @@ module ViewComponents =
                                                     prop.text "Height (in inches)"
                                                 ]
                                                 Html.input [
+                                                    prop.id "user-information-form-element-height"
                                                     prop.className "rounded-md w-full shadow"
                                                     prop.style [
                                                         style.backgroundColor "#85B79D"
                                                         style.color "#16302B"
                                                     ]
                                                     prop.type' "number"
+                                                    prop.onChange (fun value ->
+                                                        let elem = Browser.Dom.document.getElementById "user-information-form-element-height"
+                                                        elem.setAttribute ("value", value)
+                                                    )
                                                 ]
                                             ]
                                         ]
                                         Html.div [
-                                            prop.id "form-element-weight"
                                             prop.className "flex flex-col text-left text-lg my-3 mx-20"
                                             prop.children [
                                                 Html.label [
@@ -456,17 +495,21 @@ module ViewComponents =
                                                     prop.text "Weight (in pounds)"
                                                 ]
                                                 Html.input [
+                                                    prop.id "user-information-form-element-weight"
                                                     prop.className "rounded-md w-full shadow"
                                                     prop.style [
                                                         style.backgroundColor "#85B79D"
                                                         style.color "#16302B"
                                                     ]
                                                     prop.type' "number"
+                                                    prop.onChange (fun value ->
+                                                        let elem = Browser.Dom.document.getElementById "user-information-form-element-weight"
+                                                        elem.setAttribute ("value", value)
+                                                    )
                                                 ]
                                             ]
                                         ]
                                         Html.div [
-                                            prop.id "form-element-activity-factor"
                                             prop.className "flex flex-col text-left text-lg my-3 mx-20"
                                             prop.children [
                                                 Html.label [
@@ -475,12 +518,17 @@ module ViewComponents =
                                                     prop.text "Activity Factor"
                                                 ]
                                                 Html.input [
+                                                    prop.id "user-information-form-element-activity-factor"
                                                     prop.className "rounded-md w-full shadow"
                                                     prop.style [
                                                         style.backgroundColor "#85B79D"
                                                         style.color "#16302B"
                                                     ]
                                                     prop.type' "number"
+                                                    prop.onChange (fun value ->
+                                                        let elem = Browser.Dom.document.getElementById "user-information-form-element-activity-factor"
+                                                        elem.setAttribute ("value", value)
+                                                    )
                                                 ]
                                             ]
                                         ]
@@ -494,7 +542,21 @@ module ViewComponents =
                                                     prop.type' "button"
                                                     prop.text "Submit"
                                                     prop.onClick (fun _ ->
+                                                        // Hide modal
                                                         (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "none"
+
+                                                        // Call update method in order to post user data to the server
+                                                        let newUser = {
+                                                            Id = Guid.NewGuid();
+                                                            Name = (Browser.Dom.document.getElementById "user-information-form-element-name").getAttribute "value";
+                                                            Age = (Browser.Dom.document.getElementById "user-information-form-element-age").getAttribute "value" |> int;
+                                                            Height = (Browser.Dom.document.getElementById "user-information-form-element-height").getAttribute "value" |> int;
+                                                            Weight = (Browser.Dom.document.getElementById "user-information-form-element-weight").getAttribute "value" |> float;
+                                                            ActivityFactor = (Browser.Dom.document.getElementById "user-information-form-element-activity-factor").getAttribute "value" |> float;
+                                                        }
+                                                        dispatch (SubmitUserInformationForm(newUser))
+
+                                                        dispatch (PostUserInformation(Start(newUser)))
                                                     )
                                                 ]
                                             ]
@@ -624,7 +686,7 @@ let view (model: Model) dispatch =
                 | NotStarted -> ()
                 | Loading -> ()
                 | Loaded userInformation ->
-                    if userInformation.Length = 0
+                    if userInformation.Id = Guid.Empty
                     then (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "block"
             (*
             Html.div [
