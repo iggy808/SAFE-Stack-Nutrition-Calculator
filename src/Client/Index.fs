@@ -372,41 +372,132 @@ module ViewComponents =
     let userInformationFormModal model dispatch =
         Html.div [
             prop.id "user-information-form-modal"
-            prop.className "fixed hidden insert-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
+            // Dim website when modal is visible
+            prop.className "fixed h-full w-full hidden bg-gray-600/50 flex flex-col"
             prop.children [
                 Html.div [
-                    prop.className "relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"
+                    prop.className "relative mt-[75px] mx-auto p-5 w-1/4 h-3/8 shadow-lg rounded-full shadow-lg"
+                    prop.style [style.backgroundColor "#E3D0D8"]
                     prop.children [
                         Html.div [
-                            prop.className "mt-3 text-center"
+                            prop.className "text-center mt-3"
                             prop.children [
-                                Html.div [
-                                    prop.className "mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-purple-100"
-                                    prop.text "nice"
-                                ]
                                 Html.h3 [
-                                    prop.className "text-lg leading-6 font-medium text-gray-900"
-                                    prop.text "nice"
+                                    prop.className "text-2xl font-bold"
+                                    prop.text "User Information Form"
+                                    prop.style [style.color "#8C5F66"]
                                 ]
-                                Html.div [
-                                    prop.className "mt-2 px-7 py-3"
+                                Html.form [
                                     prop.children [
-                                        Html.p [
-                                            prop.className "text-sm text-gray-500"
-                                            prop.text "nice"
+                                        Html.div [
+                                            prop.id "form-element-name"
+                                            prop.className "flex flex-col text-left text-lg my-3 mx-20"
+                                            prop.children [
+                                                Html.label [
+                                                    prop.className "font-bold"
+                                                    prop.style [style.color "#8C5F66"]
+                                                    prop.text "Name"
+                                                ]
+                                                Html.input [
+                                                    prop.className "rounded-md w-full shadow"
+                                                    prop.style [
+                                                        style.backgroundColor "#85B79D"
+                                                        style.color "#16302B"
+                                                    ]
+                                                    prop.type' "text"
+                                                ]
+                                            ]
                                         ]
-                                    ]
-                                ]
-                                Html.div [
-                                    prop.className "items-center px-4 py-3"
-                                    prop.children [
-                                        Html.button [
-                                            prop.id "nicebutton"
-                                            prop.className "px-4 py-2 bg-purple-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-300"
-                                            prop.text "nice"
-                                            prop.onClick (fun _ ->
-                                                (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "none"
-                                            )
+                                        Html.div [
+                                            prop.id "form-element-age"
+                                            prop.className "flex flex-col text-left text-lg my-3 mx-20"
+                                            prop.children [
+                                                Html.label [
+                                                    prop.className "font-bold"
+                                                    prop.style [style.color "#8C5F66"]
+                                                    prop.text "Age"
+                                                ]
+                                                Html.input [
+                                                    prop.className "rounded-md w-full shadow"
+                                                    prop.style [
+                                                        style.backgroundColor "#85B79D"
+                                                        style.color "#16302B"
+                                                    ]
+                                                    prop.type' "number"
+                                                ]
+                                            ]
+                                        ]
+                                        Html.div [
+                                            prop.id "form-element-height"
+                                            prop.className "flex flex-col text-left text-lg my-3 mx-20"
+                                            prop.children [
+                                                Html.label [
+                                                    prop.className "font-bold"
+                                                    prop.style [style.color "#8C5F66"]
+                                                    prop.text "Height (in inches)"
+                                                ]
+                                                Html.input [
+                                                    prop.className "rounded-md w-full shadow"
+                                                    prop.style [
+                                                        style.backgroundColor "#85B79D"
+                                                        style.color "#16302B"
+                                                    ]
+                                                    prop.type' "number"
+                                                ]
+                                            ]
+                                        ]
+                                        Html.div [
+                                            prop.id "form-element-weight"
+                                            prop.className "flex flex-col text-left text-lg my-3 mx-20"
+                                            prop.children [
+                                                Html.label [
+                                                    prop.className "font-bold"
+                                                    prop.style [style.color "#8C5F66"]
+                                                    prop.text "Weight (in pounds)"
+                                                ]
+                                                Html.input [
+                                                    prop.className "rounded-md w-full shadow"
+                                                    prop.style [
+                                                        style.backgroundColor "#85B79D"
+                                                        style.color "#16302B"
+                                                    ]
+                                                    prop.type' "number"
+                                                ]
+                                            ]
+                                        ]
+                                        Html.div [
+                                            prop.id "form-element-activity-factor"
+                                            prop.className "flex flex-col text-left text-lg my-3 mx-20"
+                                            prop.children [
+                                                Html.label [
+                                                    prop.className "font-bold"
+                                                    prop.style [style.color "#8C5F66"]
+                                                    prop.text "Activity Factor"
+                                                ]
+                                                Html.input [
+                                                    prop.className "rounded-md w-full shadow"
+                                                    prop.style [
+                                                        style.backgroundColor "#85B79D"
+                                                        style.color "#16302B"
+                                                    ]
+                                                    prop.type' "number"
+                                                ]
+                                            ]
+                                        ]
+                                        Html.div [
+                                            prop.className "mx-auto w-1/4"
+                                            prop.children [
+                                                Html.button [
+                                                    prop.id "user-information-form-submit-button"
+                                                    prop.className "mt-1 px-4 py-2 text-white text-base font-medium rounded-md w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+                                                    prop.style [style.backgroundColor "#8C5F66"]
+                                                    prop.type' "button"
+                                                    prop.text "Submit"
+                                                    prop.onClick (fun _ ->
+                                                        (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "none"
+                                                    )
+                                                ]
+                                            ]
                                         ]
                                     ]
                                 ]
@@ -428,13 +519,6 @@ let view (model: Model) dispatch =
         ]
 
         prop.children [
-            ViewComponents.userInformationFormModal model dispatch
-            match model.UserInformation with
-                | NotStarted -> ()
-                | Loading -> ()
-                | Loaded userInformation ->
-                    if userInformation.Length = 0
-                    then (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "block"
             Html.div [
                 prop.id "title-container"
                 prop.className "my-[25px]"
@@ -535,6 +619,13 @@ let view (model: Model) dispatch =
                     ]
                 ]
             ]
+            ViewComponents.userInformationFormModal model dispatch
+            match model.UserInformation with
+                | NotStarted -> ()
+                | Loading -> ()
+                | Loaded userInformation ->
+                    if userInformation.Length = 0
+                    then (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "block"
             (*
             Html.div [
                 prop.className "flex flex-col items-center h-full"
