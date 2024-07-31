@@ -10,7 +10,12 @@ type User = {
     Weight: float;
     ActivityFactor: float;
 }
-with static member Default = {
+
+module User =
+    let isValid (name:string) =
+        true
+
+    let Default = {
         Id = Guid.Empty;
         Name = "";
         Age =  -1;
@@ -18,8 +23,3 @@ with static member Default = {
         Weight = -1;
         ActivityFactor = -1;
     }
-
-
-module User =
-    let isValid (name:string) =
-        true

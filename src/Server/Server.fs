@@ -10,6 +10,7 @@ open UserRepository
 let context = new Context()
 let dailyTargetsRepository = new TargetsRepository(context)
 let userRepository = new UserRepository(context)
+
 let nutritionApi ctx = {
 
     // Daily Targets
