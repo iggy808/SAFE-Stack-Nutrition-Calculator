@@ -7,26 +7,22 @@ open Context
 open TargetsRepository
 open UserRepository
 
-let context = new Context()
-let dailyTargetsRepository = new TargetsRepository(context)
-let userRepository = new UserRepository(context)
-
 let nutritionApi ctx = {
 
     // Daily Targets
-    getDailyTargets = fun _ -> async { return dailyTargetsRepository.GetAllDailyTargets () }
+    getDailyTargets = fun _ -> async { return TargetsRepository.GetAllDailyTargets () }
     createDailyTargets = fun dailyTargets -> async {
         return
-            match dailyTargetsRepository.CreateDailyTargets dailyTargets with
+            match TargetsRepository.CreateDailyTargets dailyTargets with
                 | Ok() -> dailyTargets
                 | Error e -> failwith e
     }
 
     // User Information
-    getUser = fun _ -> async { return userRepository.GetUser () }
+    getUser = fun _ -> async { return UserRepository.GetUser () }
     createUser = fun user -> async {
         return
-            match userRepository.CreateUser (user) with
+            match UserRepository.CreateUser (user) with
             | Ok() -> ()
             | Error e -> failwith e
     }

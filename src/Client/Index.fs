@@ -8,8 +8,8 @@ open Records
 open Browser.CssExtensions
 
 type Model = {
-    UserInformation: RemoteData<User>
-    UserInformationDto: User
+    UserInformation: RemoteData<User option>
+    UserInformationDto: User option
     Targets: RemoteData<Targets list>
     Input: string
 }
@@ -18,53 +18,54 @@ type Msg =
     | SetInput of string
     | LoadDailyTargets of ApiCall<unit, Targets list>
     | SaveTodo of ApiCall<string, Targets>
-    | SubmitUserInformationForm of User
-    | GetUserInformation of ApiCall<unit, User>
-    | PostUserInformation of ApiCall<User, unit>
+    | GetUser of ApiCall<unit, User option>
+    | CreateUser of ApiCall<User, unit>
 
 let nutritionApi = Api.makeProxy<INutritionApi> ()
 
 let init () =
     let initialModel = {
         UserInformation = NotStarted;
-        UserInformationDto = User.Default
+        UserInformationDto = None
         Targets = NotStarted;
         Input = "" }
-    //let initialCmd = LoadDailyTargets(Start()) |> Cmd.ofMsg
-    let initialCmd = GetUserInformation(Start()) |> Cmd.ofMsg
+    let initialCmd = GetUser(Start()) |> Cmd.ofMsg
 
     initialModel, initialCmd
 
 let update msg model =
     match msg with
-    | GetUserInformation msg ->
+
+    | GetUser msg ->
         match msg with
         | Start() ->
+            // Debug logs
             Browser.Dom.console.log "Get user from server started"
-            let loadUserInformation_command = Cmd.OfAsync.perform nutritionApi.getUser () (Finished >> GetUserInformation)
+
+            let loadUserInformation_command = Cmd.OfAsync.perform nutritionApi.getUser () (Finished >> GetUser)
             { model with UserInformation = Loading }, loadUserInformation_command
 
         | Finished userInformation ->
+            // Debug logs
             Browser.Dom.console.log "User fetched from server"
-            Browser.Dom.console.log ("User Id: " + userInformation.Id.ToString() + "User Name: " + userInformation.Name)
-            { model with UserInformation = Loaded userInformation }, Cmd.none
+            match userInformation with
+            | Some user -> Browser.Dom.console.log ("User Id: " + user.Id.ToString() + "User Name: " + user.Name) |> ignore
+            | None -> ()
 
-    | PostUserInformation msg ->
+            { model with UserInformation = Loaded (userInformation) }, Cmd.none
+
+    | CreateUser msg ->
         match msg with
         | Start user ->
             Browser.Dom.console.log "Post user to server started"
-            Browser.Dom.console.log ("user info dto in update method - Pre Post: " + user.ToString())
 
-            let updateUserInformation_command = Cmd.OfAsync.perform nutritionApi.createUser user (Finished >> PostUserInformation)
+            let updateUserInformation_command = Cmd.OfAsync.perform nutritionApi.createUser user (Finished >> CreateUser)
             model, updateUserInformation_command
 
         | Finished _ ->
             Browser.Dom.console.log "User posted to server"
-            let loadUserInformation_command = Cmd.OfAsync.perform nutritionApi.getUser () (Finished >> GetUserInformation)
+            let loadUserInformation_command = Cmd.OfAsync.perform nutritionApi.getUser () (Finished >> GetUser)
             { model with UserInformation = Loading }, loadUserInformation_command
-
-    | SubmitUserInformationForm user ->
-        { model with UserInformationDto =  user }, Cmd.none
 
 
     | SetInput value -> { model with Input = value }, Cmd.none
@@ -554,9 +555,8 @@ module ViewComponents =
                                                             Weight = (Browser.Dom.document.getElementById "user-information-form-element-weight").getAttribute "value" |> float;
                                                             ActivityFactor = (Browser.Dom.document.getElementById "user-information-form-element-activity-factor").getAttribute "value" |> float;
                                                         }
-                                                        dispatch (SubmitUserInformationForm(newUser))
 
-                                                        dispatch (PostUserInformation(Start(newUser)))
+                                                        dispatch (CreateUser(Start(newUser)))
                                                     )
                                                 ]
                                             ]
@@ -686,8 +686,9 @@ let view (model: Model) dispatch =
                 | NotStarted -> ()
                 | Loading -> ()
                 | Loaded userInformation ->
-                    if userInformation.Id = Guid.Empty
-                    then (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "block"
+                    match userInformation with
+                    | None -> (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "block"
+                    | Some user -> ()
             (*
             Html.div [
                 prop.className "flex flex-col items-center h-full"

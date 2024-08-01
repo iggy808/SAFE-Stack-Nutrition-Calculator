@@ -1,17 +1,14 @@
 module UserRepository
-
-open Context
-open System
 open Records
 open System.Linq
 
-type UserRepository (context: Context) =
-    member _.GetUser () =
-        let users = context.Users.FindAll() 
-        if users.Count() = 0
-        then User.Default
-        else users.First()
 
-    member _.CreateUser (user: User) =
-        context.Users.Insert (user) |> ignore
-        Ok()
+let GetUser () =
+    let users = Context.db.Users.FindAll() 
+    if users.Any()
+    then Some (users.First())
+    else None
+
+let CreateUser (user: User) =
+    Context.db.Users.Insert (user) |> ignore
+    Ok()
