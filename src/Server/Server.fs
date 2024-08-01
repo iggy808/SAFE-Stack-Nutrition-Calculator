@@ -3,20 +3,12 @@ module Server
 open SAFE
 open Saturn
 open Shared
-open Context
-open TargetsRepository
-open UserRepository
 
 let nutritionApi ctx = {
 
     // Daily Targets
-    getDailyTargets = fun _ -> async { return TargetsRepository.GetAllDailyTargets () }
-    createDailyTargets = fun dailyTargets -> async {
-        return
-            match TargetsRepository.CreateDailyTargets dailyTargets with
-                | Ok() -> dailyTargets
-                | Error e -> failwith e
-    }
+    getTargets = fun _ -> async { return UserTargetsRepository.GetDailyUserTargets () }
+
 
     // User Information
     getUser = fun _ -> async { return UserRepository.GetUser () }

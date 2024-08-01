@@ -3,6 +3,7 @@ module Dashboard.Index
 open Elmish
 open SAFE
 open Shared
+open Shared.Queries
 open System
 open Records
 open Browser.CssExtensions
@@ -16,10 +17,10 @@ type Model = {
 
 type Msg =
     | SetInput of string
-    | LoadDailyTargets of ApiCall<unit, Targets list>
     | SaveTodo of ApiCall<string, Targets>
     | GetUser of ApiCall<unit, User option>
     | CreateUser of ApiCall<User, unit>
+    | GetUserTargets of ApiCall<GetUserTargetsQuery, Targets list>
 
 let nutritionApi = Api.makeProxy<INutritionApi> ()
 
@@ -49,10 +50,8 @@ let update msg model =
             // Debug logs
             Browser.Dom.console.log "User fetched from server"
             match userInformation with
-            | Some user -> Browser.Dom.console.log ("User Id: " + user.Id.ToString() + "User Name: " + user.Name) |> ignore
-            | None -> ()
-
-            { model with User = Loaded (userInformation) }, Cmd.none
+            | Some user -> { model with User = Loaded (userInformation) }, GetUserTargets(Start()) |> Cmd.ofMsg
+            | None -> { model with User = Loaded (userInformation) }, Cmd.none
 
     | CreateUser msg ->
         match msg with
@@ -67,15 +66,16 @@ let update msg model =
             let loadUserInformation_command = Cmd.OfAsync.perform nutritionApi.getUser () (Finished >> GetUser)
             { model with User = Loading }, loadUserInformation_command
 
-
     | SetInput value -> { model with Input = value }, Cmd.none
-    | LoadDailyTargets msg ->
+
+    | GetUserTargets msg ->
         match msg with
         | Start() ->
-            let loadDailyTargets_command = Cmd.OfAsync.perform nutritionApi.getDailyTargets () (Finished >> LoadDailyTargets)
-
+            let loadDailyTargets_command = Cmd.OfAsync.perform nutritionApi.getTargets (model.User.) (Finished >> GetUserTargets)
             { model with Targets = Loading }, loadDailyTargets_command
-        | Finished dailyTargets -> { model with Targets = Loaded dailyTargets }, Cmd.none
+
+        | Finished targets -> { model with Targets = Loaded targets }, Cmd.none
+
     | SaveTodo msg ->
         match msg with
         | Start todoText ->
@@ -207,12 +207,12 @@ module ViewComponents =
                     prop.id "personal-information-greeting"
                     prop.className "text-3xl font-bold p-4"
                     match model.User with
-                    | NotStarted -> ()
-                    | Loading -> ()
+                    | NotStarted -> prop.text "Hello!"
+                    | Loading -> prop.text "Hello!"
                     | Loaded user ->
                         match user with
                         | Some user -> prop.text ("Hello, " + user.Name + "!")
-                        | None -> ()
+                        | None -> prop.text "Hello!"
                     prop.style [
                         style.color "#16302B"
                         style.borderBottom (length.px 1, borderStyle.solid, "#16302B")
@@ -236,12 +236,12 @@ module ViewComponents =
                                 Html.label [
                                     prop.className "text-xl"
                                     match model.User with
-                                    | NotStarted -> ()
-                                    | Loading -> ()
+                                    | NotStarted -> prop.text "N/A"
+                                    | Loading -> prop.text "N/A"
                                     | Loaded user ->
                                         match user with
                                         | Some user -> prop.text user.Age
-                                        | None -> ()
+                                        | None -> prop.text "N/A"
                                 ]
                             ]
 
@@ -257,12 +257,12 @@ module ViewComponents =
                                 Html.label [
                                     prop.className "text-xl"
                                     match model.User with
-                                    | NotStarted -> ()
-                                    | Loading -> ()
+                                    | NotStarted -> prop.text "N/A"
+                                    | Loading -> prop.text "N/A"
                                     | Loaded user ->
                                         match user with
                                         | Some user -> prop.text user.Height
-                                        | None -> ()
+                                        | None -> prop.text "N/A"
                                 ]
                             ]
                         ]
@@ -277,12 +277,12 @@ module ViewComponents =
                                 Html.label [
                                     prop.className "text-xl"
                                     match model.User with
-                                    | NotStarted -> ()
-                                    | Loading -> ()
+                                    | NotStarted -> prop.text "N/A"
+                                    | Loading -> prop.text "N/A"
                                     | Loaded user ->
                                         match user with
                                         | Some user -> prop.text user.Weight
-                                        | None -> ()
+                                        | None -> prop.text "N/A"
                                 ]
                             ]
                         ]
@@ -297,12 +297,12 @@ module ViewComponents =
                                 Html.label [
                                     prop.className "text-xl"
                                     match model.User with
-                                    | NotStarted -> ()
-                                    | Loading -> ()
+                                    | NotStarted -> prop.text "N/A"
+                                    | Loading -> prop.text "N/A"
                                     | Loaded user ->
                                         match user with
                                         | Some user -> prop.text user.ActivityFactor
-                                        | None -> ()
+                                        | None -> prop.text "N/A"
                                 ]
                             ]
                         ]
@@ -435,7 +435,7 @@ module ViewComponents =
             prop.className "fixed h-full w-full hidden bg-gray-600/50 flex flex-col"
             prop.children [
                 Html.div [
-                    prop.className "relative mt-[75px] mx-auto p-5 w-1/4 h-3/8 shadow-lg rounded-full shadow-lg"
+                    prop.className "relative mt-[75px] mx-auto p-5 w-1/4 h-3/8 shadow-lg rounded-full shadow-lg" //w-1/4 h-3/8
                     prop.style [style.backgroundColor "#E3D0D8"]
                     prop.children [
                         Html.div [
@@ -715,6 +715,7 @@ let view (model: Model) dispatch =
                 | NotStarted -> ()
                 | Loading -> ()
                 | Loaded userInformation ->
+                    // If no user exists within the database, display the Create User modal
                     match userInformation with
                     | None -> (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "block"
                     | Some user -> ()

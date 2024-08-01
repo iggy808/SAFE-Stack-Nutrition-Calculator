@@ -12,7 +12,7 @@ type Context () =
         new LiteDatabase(connectionString, mapper)
 
     member val todos = database.GetCollection<Todo> "todos"
-    member val Targets = database.GetCollection<Targets> "Targets"
+    member val UserTargets = database.GetCollection<UserTargets> "UserTargets"
     member val Users = database.GetCollection<User> "Users"
 
 let db = Context()
