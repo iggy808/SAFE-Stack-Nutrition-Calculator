@@ -2,7 +2,7 @@ module Client.Tests
 
 open Fable.Mocha
 
-open Index
+open Dashboard.Index
 open Shared
 open SAFE
 (*

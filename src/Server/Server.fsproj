@@ -6,9 +6,10 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Calculations.fs" />
     <Compile Include="Data\Context.fs" />
     <Compile Include="Repositories\UserRepository.fs" />
-    <Compile Include="Repositories\TargetsRepository.fs" />
+    <Compile Include="Repositories\UserTargetsRepository.fs" />
     <None Include="paket.references" />
     <Compile Include="Server.fs" />
   </ItemGroup>

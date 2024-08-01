@@ -11,16 +11,15 @@ open Browser.CssExtensions
 type Model = {
     User: RemoteData<User option>
     UserDto: User option
-    Targets: RemoteData<Targets list>
+    Targets: RemoteData<UserTargets>
     Input: string
 }
 
 type Msg =
     | SetInput of string
-    | SaveTodo of ApiCall<string, Targets>
     | GetUser of ApiCall<unit, User option>
     | CreateUser of ApiCall<User, unit>
-    | GetUserTargets of ApiCall<GetUserTargetsQuery, Targets list>
+    | GetUserTargets of ApiCall<Guid option, UserTargets>
 
 let nutritionApi = Api.makeProxy<INutritionApi> ()
 
@@ -50,7 +49,7 @@ let update msg model =
             // Debug logs
             Browser.Dom.console.log "User fetched from server"
             match userInformation with
-            | Some user -> { model with User = Loaded (userInformation) }, GetUserTargets(Start()) |> Cmd.ofMsg
+            | Some user -> { model with User = Loaded (userInformation) }, GetUserTargets(Start(Some user.Id)) |> Cmd.ofMsg
             | None -> { model with User = Loaded (userInformation) }, Cmd.none
 
     | CreateUser msg ->
@@ -70,26 +69,15 @@ let update msg model =
 
     | GetUserTargets msg ->
         match msg with
-        | Start() ->
-            let loadDailyTargets_command = Cmd.OfAsync.perform nutritionApi.getTargets (model.User.) (Finished >> GetUserTargets)
-            { model with Targets = Loading }, loadDailyTargets_command
+        | Start userId ->
+
+            match userId with
+            | Some userId ->
+                { model with Targets = Loading },
+                Cmd.OfAsync.perform nutritionApi.getDailyUserTargets { UserId = userId; Date = DateOnly.FromDateTime(DateTime.Now); } (Finished >> GetUserTargets)
+            | None -> { model with Targets = NotStarted }, Cmd.none
 
         | Finished targets -> { model with Targets = Loaded targets }, Cmd.none
-
-    | SaveTodo msg ->
-        match msg with
-        | Start todoText ->
-            let saveTodoCmd =
-                let todo = Todo.create todoText
-                Cmd.OfAsync.perform nutritionApi.createDailyTargets (Targets.create (DateOnly.FromDateTime(DateTime.Now))) (Finished >> SaveTodo)
-
-            { model with Input = "" }, saveTodoCmd
-        | Finished DailyTargets ->
-            {
-                model with
-                    Targets = model.Targets |> RemoteData.map (fun dailyTargets -> dailyTargets @ [ DailyTargets ])
-            },
-            Cmd.none
 
 open Feliz
 
@@ -105,20 +93,21 @@ module ViewComponents =
                     prop.placeholder "What needs to be done?"
                     prop.autoFocus true
                     prop.onChange (SetInput >> dispatch)
-                    prop.onKeyPress (fun ev ->
+                    (*prop.onKeyPress (fun ev ->
                         if ev.key = "Enter" then
-                            dispatch (SaveTodo(Start model.Input)))
+                            dispatch (SaveTodo(Start model.Input)))*)
                 ]
                 Html.button [
                     prop.className
                         "flex-no-shrink p-2 px-12 rounded bg-teal-600 outline-none focus:ring-2 ring-teal-300 font-bold text-white hover:bg-teal disabled:opacity-30 disabled:cursor-not-allowed"
                     prop.disabled (Todo.isValid model.Input |> not)
-                    prop.onClick (fun _ -> dispatch (SaveTodo(Start model.Input)))
+                    (*prop.onClick (fun _ -> dispatch (SaveTodo(Start model.Input)))*)
                     prop.text "Add"
                 ]
             ]
         ]
 
+    (*
     let todoList model dispatch =
         Html.div [
             prop.className "bg-white/80 rounded-md shadow-md p-4 w-5/6 lg:w-3/4 lg:max-w-2xl"
@@ -138,6 +127,7 @@ module ViewComponents =
                 todoAction model dispatch
             ]
         ]
+    *)
 
     let navBarWidget model dispatch =
         Html.div [
@@ -311,7 +301,7 @@ module ViewComponents =
             ]
         ]
 
-    let dailyTargetsWidget model dispatch =
+    let dailyTargetsWidget (model:Model) dispatch =
         Html.div [
             prop.id "daily-targets-widget"
             prop.className "m-[10px] grow flex flex-col"
@@ -346,14 +336,17 @@ module ViewComponents =
                                     prop.style [
                                         style.color "#16302B"
                                     ]
-                                    prop.text "Target Calories"
+                                    prop.text "Maintenance Calories"
                                 ]
                                 Html.label [
                                     prop.className "text-2xl basis-3/4 ml-4 mt-4"
                                     prop.style [
                                         style.color "#16302B"
                                     ]
-                                    prop.text ("500000" + " calories")
+                                    match model.Targets with
+                                    | NotStarted -> prop.text "N/A"
+                                    | Loading -> prop.text "N/A"
+                                    | Loaded targets -> prop.text targets.MaintenanceCalories
                                 ]
                             ]        
                         ]
@@ -375,7 +368,10 @@ module ViewComponents =
                                     prop.style [
                                         style.color "#16302B"
                                     ]
-                                    prop.text ("500000" + " grams")
+                                    match model.Targets with
+                                    | NotStarted -> prop.text "N/A"
+                                    | Loading -> prop.text "N/A"
+                                    | Loaded targets -> prop.text (string targets.ProteinGramsPerDay + " grams")
                                 ]
                             ]        
                         ]
@@ -397,7 +393,10 @@ module ViewComponents =
                                     prop.style [
                                         style.color "#16302B"
                                     ]
-                                    prop.text ("500000" + " grams")
+                                    match model.Targets with
+                                    | NotStarted -> prop.text "N/A"
+                                    | Loading -> prop.text "N/A"
+                                    | Loaded targets -> prop.text (string targets.FatGramsPerDay + " grams")
                                 ]
                             ]        
                         ]
@@ -419,7 +418,10 @@ module ViewComponents =
                                     prop.style [
                                         style.color "#16302B"
                                     ]
-                                    prop.text ("500000" + " grams")
+                                    match model.Targets with
+                                    | NotStarted -> prop.text "N/A"
+                                    | Loading -> prop.text "N/A"
+                                    | Loaded targets -> prop.text (string targets.CarbsGramsPerDay + " grams")
                                 ]
                             ]        
                         ]

@@ -4,8 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Queries\GetDailyUserTargetsQuery.fs" />
     <Compile Include="Records\User.fs" />
-    <Compile Include="Records\Targets.fs" />
+    <Compile Include="Records\UserTargets.fs" />
     <Compile Include="Shared.fs" />
     <Content Include="paket.references" />
   </ItemGroup>
