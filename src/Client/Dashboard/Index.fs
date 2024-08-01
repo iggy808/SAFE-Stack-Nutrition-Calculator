@@ -1,4 +1,4 @@
-module Index
+module Dashboard.Index
 
 open Elmish
 open SAFE
@@ -8,8 +8,8 @@ open Records
 open Browser.CssExtensions
 
 type Model = {
-    UserInformation: RemoteData<User option>
-    UserInformationDto: User option
+    User: RemoteData<User option>
+    UserDto: User option
     Targets: RemoteData<Targets list>
     Input: string
 }
@@ -25,8 +25,8 @@ let nutritionApi = Api.makeProxy<INutritionApi> ()
 
 let init () =
     let initialModel = {
-        UserInformation = NotStarted;
-        UserInformationDto = None
+        User = NotStarted;
+        UserDto = None
         Targets = NotStarted;
         Input = "" }
     let initialCmd = GetUser(Start()) |> Cmd.ofMsg
@@ -43,7 +43,7 @@ let update msg model =
             Browser.Dom.console.log "Get user from server started"
 
             let loadUserInformation_command = Cmd.OfAsync.perform nutritionApi.getUser () (Finished >> GetUser)
-            { model with UserInformation = Loading }, loadUserInformation_command
+            { model with User = Loading }, loadUserInformation_command
 
         | Finished userInformation ->
             // Debug logs
@@ -52,7 +52,7 @@ let update msg model =
             | Some user -> Browser.Dom.console.log ("User Id: " + user.Id.ToString() + "User Name: " + user.Name) |> ignore
             | None -> ()
 
-            { model with UserInformation = Loaded (userInformation) }, Cmd.none
+            { model with User = Loaded (userInformation) }, Cmd.none
 
     | CreateUser msg ->
         match msg with
@@ -65,7 +65,7 @@ let update msg model =
         | Finished _ ->
             Browser.Dom.console.log "User posted to server"
             let loadUserInformation_command = Cmd.OfAsync.perform nutritionApi.getUser () (Finished >> GetUser)
-            { model with UserInformation = Loading }, loadUserInformation_command
+            { model with User = Loading }, loadUserInformation_command
 
 
     | SetInput value -> { model with Input = value }, Cmd.none
@@ -192,7 +192,7 @@ module ViewComponents =
             ]
         ]
 
-    let personalInformationWidget model dispatch =
+    let personalInformationWidget (model:Model) =
         Html.div [
             prop.id "personal-information-widget"
             prop.className "m-[10px] grow flex flex-col"
@@ -206,7 +206,13 @@ module ViewComponents =
                 Html.h2 [
                     prop.id "personal-information-greeting"
                     prop.className "text-3xl font-bold p-4"
-                    prop.text ("Hello, " + "Evan" + "!")
+                    match model.User with
+                    | NotStarted -> ()
+                    | Loading -> ()
+                    | Loaded user ->
+                        match user with
+                        | Some user -> prop.text ("Hello, " + user.Name + "!")
+                        | None -> ()
                     prop.style [
                         style.color "#16302B"
                         style.borderBottom (length.px 1, borderStyle.solid, "#16302B")
@@ -229,7 +235,13 @@ module ViewComponents =
                                 ]
                                 Html.label [
                                     prop.className "text-xl"
-                                    prop.text 23
+                                    match model.User with
+                                    | NotStarted -> ()
+                                    | Loading -> ()
+                                    | Loaded user ->
+                                        match user with
+                                        | Some user -> prop.text user.Age
+                                        | None -> ()
                                 ]
                             ]
 
@@ -244,7 +256,13 @@ module ViewComponents =
                                 ]
                                 Html.label [
                                     prop.className "text-xl"
-                                    prop.text 71
+                                    match model.User with
+                                    | NotStarted -> ()
+                                    | Loading -> ()
+                                    | Loaded user ->
+                                        match user with
+                                        | Some user -> prop.text user.Height
+                                        | None -> ()
                                 ]
                             ]
                         ]
@@ -258,7 +276,13 @@ module ViewComponents =
                                 ]
                                 Html.label [
                                     prop.className "text-xl"
-                                    prop.text 270
+                                    match model.User with
+                                    | NotStarted -> ()
+                                    | Loading -> ()
+                                    | Loaded user ->
+                                        match user with
+                                        | Some user -> prop.text user.Weight
+                                        | None -> ()
                                 ]
                             ]
                         ]
@@ -272,7 +296,13 @@ module ViewComponents =
                                 ]
                                 Html.label [
                                     prop.className "text-xl"
-                                    prop.text 1.3
+                                    match model.User with
+                                    | NotStarted -> ()
+                                    | Loading -> ()
+                                    | Loaded user ->
+                                        match user with
+                                        | Some user -> prop.text user.ActivityFactor
+                                        | None -> ()
                                 ]
                             ]
                         ]
@@ -612,8 +642,7 @@ let view (model: Model) dispatch =
                                 prop.id "personal-information-container"
                                 prop.className "flex flex-col"
                                 prop.children [
-                                    
-                                    ViewComponents.personalInformationWidget model dispatch
+                                    ViewComponents.personalInformationWidget model
                                 ]
                             ]
                             Html.div [
@@ -682,7 +711,7 @@ let view (model: Model) dispatch =
                 ]
             ]
             ViewComponents.userInformationFormModal model dispatch
-            match model.UserInformation with
+            match model.User with
                 | NotStarted -> ()
                 | Loading -> ()
                 | Loaded userInformation ->
