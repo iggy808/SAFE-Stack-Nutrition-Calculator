@@ -5,7 +5,7 @@ open System
 type UserTargets = {
     Id: Guid
     UserId:Guid
-    Date: DateOnly
+    Date: string
     MaintenanceCalories: float
     ProteinGramsPerDay: float
     FatGramsPerDay: float

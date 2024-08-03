@@ -3,7 +3,6 @@ module Server
 open SAFE
 open Saturn
 open Shared
-open Context
 
 let nutritionApi ctx = {
     // User Targets

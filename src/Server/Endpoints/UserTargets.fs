@@ -5,6 +5,8 @@ open System
 open System.Linq
 open Queries
 open Commands
+open LiteDB
+open LiteDB.FSharp
 
 let createDailyUserTargets (command: CreateUserDailyTargetsCommand) = async {
     let user = Context.db.Users.FindOne(fun user -> user.Id = command.UserId)
@@ -22,7 +24,7 @@ let createDailyUserTargets (command: CreateUserDailyTargetsCommand) = async {
     let userDailyTargets = {
         Id = Guid.NewGuid()
         UserId = command.UserId
-        Date = command.Date
+        Date = command.Date |> string
         MaintenanceCalories = maintenanceCalories
         ProteinGramsPerDay = proteinPerDay_grams
         FatGramsPerDay = fatPerDay_grams
@@ -30,30 +32,20 @@ let createDailyUserTargets (command: CreateUserDailyTargetsCommand) = async {
     }
 
     Context.db.UserTargets.Insert userDailyTargets |> ignore
-
-    let q = Context.db.UserTargets.FindAll() |> List.ofSeq
-
-    let z = 4
-
-    ()
 }
 
-let hasExactlyOneUserTargets (dailyUserTargets:UserTargets list) =
-    dailyUserTargets.Length = 1
-
 let fetchUserDailyTargets (query:GetDailyUserTargetsQuery) =
-    let dailyUserTargets = Context.db.UserTargets.Find(fun userTarget ->
-        userTarget.UserId = query.UserId &&
-        userTarget.Date = query.Date) |> List.ofSeq
-
-    if hasExactlyOneUserTargets dailyUserTargets
-    then Some dailyUserTargets.Head
-    else None
+    Context.db.UserTargets.Find(fun userTargets ->
+        userTargets.UserId = query.UserId &&
+        userTargets.Date = (query.Date |> string))
+        |> List.ofSeq
+        |> List.tryExactlyOne
 
 let getDailyUserTargets (query:GetDailyUserTargetsQuery) = async {
         return
-            fetchUserDailyTargets query
-            |> function
-               | Some userTargets -> Some userTargets
-               | None -> None
+            Context.db.UserTargets.Find(fun userTargets ->
+                userTargets.UserId = query.UserId &&
+                userTargets.Date = (query.Date |> string))
+            |> List.ofSeq
+            |> List.tryExactlyOne
 }
