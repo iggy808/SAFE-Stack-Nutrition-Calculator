@@ -5,17 +5,12 @@ open Saturn
 open Shared
 
 let nutritionApi ctx = {
-    // Daily Targets
-    getDailyUserTargets = fun query -> async { return UserTargetsRepository.GetDailyUserTargets (query) }
+    // User Targets
+    getDailyUserTargets = fun query -> Endpoints.UserTargets.getDailyUserTargets query
 
-    // User Information
-    getUser = fun _ -> async { return UserRepository.GetUser () }
-    createUser = fun user -> async {
-        return
-            match UserRepository.CreateUser (user) with
-            | Ok() -> ()
-            | Error e -> failwith e
-    }
+    // User
+    getUser = fun _ -> Endpoints.User.getUser
+    createUser = fun user -> Endpoints.User.createUser user
 }
 
 let webApp = Api.make nutritionApi

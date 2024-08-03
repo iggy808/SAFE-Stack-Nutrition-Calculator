@@ -12,8 +12,18 @@ type User = {
 }
 
 module User =
-    let isValid (name:string) =
-        true
+    let isNameValid name = String.IsNullOrWhiteSpace name |> not
+    let isAgeWithinValidRange age = age > 0 && age < 120
+    let isHeightWithinValidRange height = height > 0 && height < 144
+    let isWeightWithinValidRange weight = weight > 0.0 && weight < 1000.0
+    let isActivityFactorWithinValidRange activityFactor = activityFactor > 0.0 && activityFactor < 3.0
+
+    let isValid (user:User) =
+        user.Name |> isNameValid &&
+        user.Age |> isAgeWithinValidRange &&
+        user.Height |> isHeightWithinValidRange &&
+        user.Weight |> isWeightWithinValidRange &&
+        user.ActivityFactor |> isActivityFactorWithinValidRange
 
     let Default = {
         Id = Guid.Empty;

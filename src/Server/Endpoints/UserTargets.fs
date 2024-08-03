@@ -1,20 +1,19 @@
-module UserTargetsRepository
-open System
-open System.Linq
-open Shared.Queries
+module Endpoints.UserTargets
+
 open Records
-open Calculations
+open Shared.Queries
+open System
 
-
-let CreateDailyTargets userId =
+let createDailyTargets userId =
     let user = Context.db.Users.FindOne(fun user -> user.Id = userId)
 
-    let basalMetabolicRate = Calculations.calculateBasalMetabolicRate user.Weight user.Height user.Age
-    let maintenanceCalories = basalMetabolicRate * user.ActivityFactor
     let proteinPerDay_grams = (Calculations.convertPoundsToKilograms user.Weight) * 1.2
     let proteinPerDay_calories = proteinPerDay_grams * 4.0
     let fatPerDay_grams = (Calculations.convertInchesToCentimeters user.Height) - 100.0
     let fatPerDay_calories = fatPerDay_grams * 9.0
+
+    let basalMetabolicRate = Calculations.calculateBasalMetabolicRate user.Weight user.Height user.Age
+    let maintenanceCalories = basalMetabolicRate * user.ActivityFactor
     let carbsPerDay_calories = maintenanceCalories - proteinPerDay_calories - fatPerDay_calories
     let carbsPerDay_grams = carbsPerDay_calories / 4.0
 
@@ -32,13 +31,17 @@ let CreateDailyTargets userId =
 
     userDailyTargets
 
-let GetDailyUserTargets (query:GetDailyUserTargetsQuery) =
-        let dailyTargets = Context.db.UserTargets.Find(fun userTarget ->
-                userTarget.UserId = query.UserId &&
-                userTarget.Date = DateOnly.FromDateTime(DateTime.Now)) |> List.ofSeq
+let fetchUserDailyTargets userId =
+    Context.db.UserTargets.Find(fun userTarget ->
+        userTarget.UserId = userId &&
+        userTarget.Date = DateOnly.FromDateTime(DateTime.Now))
+    |> List.ofSeq
+    |> List.tryExactlyOne
 
-        // Unsure how to perform a null check / option match on the value returned from FindOne - will need to research
-        // For now, hacky list check will do
-        if dailyTargets.Any()
-        then dailyTargets.Head
-        else CreateDailyTargets query.UserId
+let getDailyUserTargets (query:GetDailyUserTargetsQuery) = async {
+        return
+            fetchUserDailyTargets query.UserId
+            |> function
+                | Some userTargets -> userTargets
+                | None -> createDailyTargets query.UserId
+}
