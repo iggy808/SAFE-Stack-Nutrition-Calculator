@@ -117,6 +117,7 @@ let view (model: Model) dispatch =
                 ]
             ]
             Components.userInformationFormModal model dispatch
+            Components.userWeightFormModal model dispatch
             match model.User with
                 | NotStarted -> ()
                 | Loading -> ()

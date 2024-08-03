@@ -1,10 +1,10 @@
 module Endpoints.UserTargets
 
 open Records
-open Shared.Queries
 open System
+open Queries
 
-let createDailyTargets userId =
+let createDailyUserTargets userId = async {
     let user = Context.db.Users.FindOne(fun user -> user.Id = userId)
 
     let proteinPerDay_grams = (Calculations.convertPoundsToKilograms user.Weight) * 1.2
@@ -28,8 +28,7 @@ let createDailyTargets userId =
     }
 
     Context.db.UserTargets.Insert userDailyTargets |> ignore
-
-    userDailyTargets
+}
 
 let fetchUserDailyTargets userId =
     Context.db.UserTargets.Find(fun userTarget ->
@@ -39,9 +38,5 @@ let fetchUserDailyTargets userId =
     |> List.tryExactlyOne
 
 let getDailyUserTargets (query:GetDailyUserTargetsQuery) = async {
-        return
-            fetchUserDailyTargets query.UserId
-            |> function
-                | Some userTargets -> userTargets
-                | None -> createDailyTargets query.UserId
+        return fetchUserDailyTargets query.UserId
 }

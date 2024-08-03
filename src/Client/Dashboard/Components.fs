@@ -7,6 +7,7 @@ open SAFE
 open System
 open Records
 open Browser.CssExtensions
+open Commands
 
 let todoAction model dispatch =
     Html.div [
@@ -229,7 +230,7 @@ let personalInformationWidget (model:Model) =
         ]
     ]
 
-let dailyTargetsWidget (model:Model) dispatch =
+let dailyTargetsWidget (model: Model) dispatch =
     Html.div [
         prop.id "daily-targets-widget"
         prop.className "m-[10px] grow flex flex-col"
@@ -274,7 +275,10 @@ let dailyTargetsWidget (model:Model) dispatch =
                                 match model.Targets with
                                 | NotStarted -> prop.text "N/A"
                                 | Loading -> prop.text "N/A"
-                                | Loaded targets -> prop.text targets.MaintenanceCalories
+                                | Loaded targets ->
+                                    match targets with
+                                    | Some targets -> prop.text targets.MaintenanceCalories
+                                    | None -> prop.text "N/A"
                             ]
                         ]        
                     ]
@@ -299,7 +303,10 @@ let dailyTargetsWidget (model:Model) dispatch =
                                 match model.Targets with
                                 | NotStarted -> prop.text "N/A"
                                 | Loading -> prop.text "N/A"
-                                | Loaded targets -> prop.text (string targets.ProteinGramsPerDay + " grams")
+                                | Loaded targets ->
+                                    match targets with
+                                    | Some targets -> prop.text (string targets.ProteinGramsPerDay + " grams")
+                                    | None -> prop.text "N/A"
                             ]
                         ]        
                     ]
@@ -324,7 +331,10 @@ let dailyTargetsWidget (model:Model) dispatch =
                                 match model.Targets with
                                 | NotStarted -> prop.text "N/A"
                                 | Loading -> prop.text "N/A"
-                                | Loaded targets -> prop.text (string targets.FatGramsPerDay + " grams")
+                                | Loaded targets ->
+                                    match targets with
+                                    | Some targets -> prop.text (string targets.FatGramsPerDay + " grams")
+                                    | None -> prop.text "N/A"
                             ]
                         ]        
                     ]
@@ -349,7 +359,10 @@ let dailyTargetsWidget (model:Model) dispatch =
                                 match model.Targets with
                                 | NotStarted -> prop.text "N/A"
                                 | Loading -> prop.text "N/A"
-                                | Loaded targets -> prop.text (string targets.CarbsGramsPerDay + " grams")
+                                | Loaded targets ->
+                                    match targets with
+                                    | Some targets -> prop.text (string targets.CarbsGramsPerDay + " grams")
+                                    | None -> prop.text "N/A"
                             ]
                         ]        
                     ]
@@ -365,7 +378,7 @@ let userInformationFormModal (model: Model) dispatch =
         prop.className "fixed h-full w-full hidden bg-gray-600/50 flex flex-col"
         prop.children [
             Html.div [
-                prop.className "relative mt-[75px] mx-auto p-5 w-1/4 h-3/8 shadow-lg rounded-full shadow-lg" //w-1/4 h-3/8
+                prop.className "relative mt-[75px] mx-auto p-5 w-1/4 h-3/8 shadow-lg rounded-full shadow-lg"
                 prop.style [style.backgroundColor "#E3D0D8"]
                 prop.children [
                     Html.div [
@@ -520,6 +533,82 @@ let userInformationFormModal (model: Model) dispatch =
                                                 )
                                             ]
                                         ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]
+    ]
+
+let userWeightFormModal (model: Model) dispatch =
+    Html.div [
+        prop.id "update-user-weight-form-modal"
+        // Dim website when modal is visible
+        prop.className "fixed h-full w-full hidden bg-gray-600/50 flex flex-col"
+        prop.children [
+            Html.div [
+                prop.className "relative mt-[75px] mx-auto p-5 w-1/4 h-3/8 shadow-lg rounded-full shadow-lg"
+                prop.style [style.backgroundColor "#E3D0D8"]
+                prop.children [
+                    Html.h3 [
+                        prop.className "text-2xl font-bold"
+                        prop.text "Update User Weight"
+                        prop.style [style.color "#8C5F66"]
+                    ]
+                    Html.form [
+                        prop.children [
+                            Html.div [
+                                prop.className "flex flex-col text-left text-lg my-3 mx-20"
+                                prop.children [
+                                    Html.label [
+                                        prop.className "font-bold"
+                                        prop.style [style.color "#8C5F66"]
+                                        prop.text "New Weight (lb)"
+                                    ]
+                                    Html.input [
+                                        prop.id "update-user-weight-form-element"
+                                        prop.className "rounded-md w-full shadow"
+                                        prop.style [
+                                            style.backgroundColor "#85B79D"
+                                            style.color "#16302B"
+                                        ]
+                                        prop.type' "text"
+                                        prop.onChange (fun value ->
+                                            let elem = Browser.Dom.document.getElementById "update-user-weight-form-element"
+                                            elem.setAttribute ("value", value)
+                                        )
+                                    ]
+                                ]
+                            ]
+                            Html.div [
+                                prop.className "mx-auto w-1/4"
+                                prop.children [
+                                    Html.button [
+                                        prop.id "update-user-weight-form-submit-button"
+                                        prop.className "mt-1 px-4 py-2 text-white text-base font-medium rounded-md w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+                                        prop.style [style.backgroundColor "#8C5F66"]
+                                        prop.type' "button"
+                                        prop.text "Submit"
+                                        prop.onClick (fun _ ->
+                                            // Hide modal
+                                            (Browser.Dom.document.getElementById "update-user-weight-form-modal").style.display <- "none"
+
+                                            // Collect updated user weight from form
+                                            let userWeight = (Browser.Dom.document.getElementById "update-user-weight-form-element").getAttribute "value" |> float
+                                                
+                                            dispatch (UpdateUserWeight(Start(
+                                               match model.User with
+                                               | NotStarted -> None
+                                               | Loading -> None
+                                               | Loaded user ->
+                                                    match user with
+                                                    | Some user -> Some { UserId = user.Id; Weight = userWeight }
+                                                    | None -> None
+                                            )))
+                                        )
                                     ]
                                 ]
                             ]

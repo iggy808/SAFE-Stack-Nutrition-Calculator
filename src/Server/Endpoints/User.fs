@@ -19,3 +19,7 @@ let createUser (user:User) = async {
         | true -> Context.db.Users.Insert user |> ignore
         | false -> ()
 }
+
+let updateUserWeight command = async {
+    return ()
+}

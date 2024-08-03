@@ -2,7 +2,8 @@ namespace Shared
 
 open System
 open Records
-open Shared.Queries
+open Queries
+open Commands
 
 [<CLIMutable>]
 type Todo = { Id: Guid; Description: string }
@@ -17,7 +18,9 @@ module Todo =
     }
 
 type INutritionApi = {
-    getDailyUserTargets: GetDailyUserTargetsQuery -> Async<UserTargets>
+    getDailyUserTargets: GetDailyUserTargetsQuery -> Async<UserTargets option>
+    createDailyUserTargets: Guid -> Async<unit>
+    updateUserWeight: UpdateUserWeightCommand -> Async<unit>
     getUser: unit -> Async<User option>
     createUser: User -> Async<unit>
 }

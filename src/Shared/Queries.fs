@@ -1,4 +1,4 @@
-namespace Shared.Queries
+namespace Queries
 
 open System
 

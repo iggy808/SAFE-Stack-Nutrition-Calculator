@@ -5,7 +5,6 @@ open Dashboard.State
 open Elmish
 open SAFE
 open Shared
-open Shared.Queries
 open System
 open Records
 
@@ -32,14 +31,14 @@ let update msg model =
                 nutritionApi.getUser ()
                 (Finished >> GetUser)
 
-        | Finished userInformation ->
-            match userInformation with
+        | Finished user ->
+            match user with
             | Some user ->
-                { model with User = Loaded (userInformation) },
+                { model with User = Loaded (Some user) },
                 GetUserTargets(Start(Some user.Id)) |> Cmd.ofMsg
 
             | None ->
-                { model with User = Loaded (userInformation) },
+                { model with User = Loaded (user) },
                 Cmd.none
 
     | CreateUser msg ->
@@ -61,7 +60,6 @@ let update msg model =
     | GetUserTargets msg ->
         match msg with
         | Start userId ->
-
             match userId with
             | Some userId ->
                 { model with Targets = Loading },
@@ -75,3 +73,23 @@ let update msg model =
             | None -> { model with Targets = NotStarted }, Cmd.none
 
         | Finished targets -> { model with Targets = Loaded targets }, Cmd.none
+
+    | UpdateUserWeight msg ->
+        match msg with
+        | Start command ->
+            match command with
+            | Some command ->
+                model,
+                Cmd.OfAsync.perform
+                    nutritionApi.updateUserWeight command
+                    (Finished >> UpdateUserWeight)
+
+            | None ->
+                model,
+                Cmd.none
+
+        | Finished _ ->
+            model,
+            Cmd.OfAsync.perform
+                nutritionApi.getUser ()
+                (Finished >> GetUser)

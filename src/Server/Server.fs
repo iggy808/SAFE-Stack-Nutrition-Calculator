@@ -7,10 +7,12 @@ open Shared
 let nutritionApi ctx = {
     // User Targets
     getDailyUserTargets = fun query -> Endpoints.UserTargets.getDailyUserTargets query
+    createDailyUserTargets = fun userId -> Endpoints.UserTargets.createDailyUserTargets userId
 
     // User
     getUser = fun _ -> Endpoints.User.getUser
     createUser = fun user -> Endpoints.User.createUser user
+    updateUserWeight = fun command -> Endpoints.User.updateUserWeight command
 }
 
 let webApp = Api.make nutritionApi
