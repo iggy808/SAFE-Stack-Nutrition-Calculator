@@ -2,11 +2,8 @@ module Endpoints.UserTargets
 
 open Records
 open System
-open System.Linq
 open Queries
 open Commands
-open LiteDB
-open LiteDB.FSharp
 
 let createDailyUserTargets (command: CreateUserDailyTargetsCommand) = async {
     let user = Context.db.Users.FindOne(fun user -> user.Id = command.UserId)
@@ -33,13 +30,6 @@ let createDailyUserTargets (command: CreateUserDailyTargetsCommand) = async {
 
     Context.db.UserTargets.Insert userDailyTargets |> ignore
 }
-
-let fetchUserDailyTargets (query:GetDailyUserTargetsQuery) =
-    Context.db.UserTargets.Find(fun userTargets ->
-        userTargets.UserId = query.UserId &&
-        userTargets.Date = (query.Date |> string))
-        |> List.ofSeq
-        |> List.tryExactlyOne
 
 let getDailyUserTargets (query:GetDailyUserTargetsQuery) = async {
         return

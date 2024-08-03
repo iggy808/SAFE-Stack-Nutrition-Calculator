@@ -5,7 +5,7 @@ open System
 type UserTargets = {
     Id: Guid
     UserId:Guid
-    Date: string
+    Date: string // Date cannot be stored as DateOnly within LiteDB / Bson
     MaintenanceCalories: float
     ProteinGramsPerDay: float
     FatGramsPerDay: float

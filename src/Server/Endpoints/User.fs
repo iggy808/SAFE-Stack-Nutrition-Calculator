@@ -7,9 +7,6 @@ let getUser = async {
         Context.db.Users.FindAll()
         |> List.ofSeq
         |> List.tryExactlyOne
-        |> function
-            | Some user -> Some user
-            | None -> None
 }
 
 let createUser (user:User) = async {
