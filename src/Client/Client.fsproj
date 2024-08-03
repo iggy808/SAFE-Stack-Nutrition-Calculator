@@ -5,7 +5,10 @@
         <DefineConstants>FABLE_COMPILER</DefineConstants>
     </PropertyGroup>
     <ItemGroup>
+        <Compile Include="Dashboard\State.fs" />
+        <Compile Include="Dashboard\Components.fs" />
         <Compile Include="Dashboard\Index.fs" />
+        <Compile Include="Dashboard\Handler.fs" />
         <None Include="postcss.config.js" />
         <None Include="tailwind.config.js" />
         <None Include="index.html" />
