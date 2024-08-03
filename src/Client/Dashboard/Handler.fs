@@ -65,14 +65,58 @@ let update msg model =
                 { model with Targets = Loading },
                 Cmd.OfAsync.perform
                     nutritionApi.getDailyUserTargets {
-                        UserId = userId;
-                        Date = DateOnly.FromDateTime(DateTime.Now);
+                        UserId = userId
+                        Date = DateOnly.FromDateTime(DateTime.Now)
                     }
                     (Finished >> GetUserTargets)
 
             | None -> { model with Targets = NotStarted }, Cmd.none
 
-        | Finished targets -> { model with Targets = Loaded targets }, Cmd.none
+        | Finished targets ->
+            match targets with
+            | Some targets ->
+                { model with Targets = Loaded (Some targets) },
+                Cmd.none
+            | None ->
+                match model.User with
+                | NotStarted ->
+                    { model with Targets = NotStarted },
+                    Cmd.none
+                | Loading ->
+                    { model with Targets = NotStarted },
+                    Cmd.none
+                | Loaded user ->
+                    match user with
+                    | Some user ->
+                        { model with Targets = Loading },
+                        (CreateUserTargets(Start(Some user.Id))) |> Cmd.ofMsg
+                    | None ->
+                        { model with Targets = NotStarted },
+                        Cmd.none
+
+    | CreateUserTargets msg ->
+        match msg with
+        | Start userId ->
+            match userId with
+            | Some userId ->
+                { model with Targets = Loading },
+                Cmd.OfAsync.perform
+                    nutritionApi.createDailyUserTargets { UserId = userId; Date = DateOnly.FromDateTime(DateTime.Now) }
+                    (Finished >> CreateUserTargets)
+            | None ->
+                model,
+                Cmd.none
+
+        | Finished _ ->
+            match model.User with
+            | NotStarted -> { model with Targets = NotStarted }, Cmd.none
+            | Loading -> { model with Targets = NotStarted }, Cmd.none
+            | Loaded user ->
+                match user with
+                | Some user ->
+                    { model with Targets = Loading },
+                    (GetUserTargets(Start(Some user.Id))) |> Cmd.ofMsg
+                | None -> { model with Targets = NotStarted }, Cmd.none
 
     | UpdateUserWeight msg ->
         match msg with

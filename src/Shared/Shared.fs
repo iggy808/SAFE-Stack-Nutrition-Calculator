@@ -19,8 +19,8 @@ module Todo =
 
 type INutritionApi = {
     getDailyUserTargets: GetDailyUserTargetsQuery -> Async<UserTargets option>
-    createDailyUserTargets: Guid -> Async<unit>
-    updateUserWeight: UpdateUserWeightCommand -> Async<unit>
+    createDailyUserTargets: CreateUserDailyTargetsCommand -> Async<unit>
     getUser: unit -> Async<User option>
     createUser: User -> Async<unit>
+    updateUserWeight: UpdateUserWeightCommand -> Async<unit>
 }

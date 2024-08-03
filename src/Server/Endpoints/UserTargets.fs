@@ -2,10 +2,12 @@ module Endpoints.UserTargets
 
 open Records
 open System
+open System.Linq
 open Queries
+open Commands
 
-let createDailyUserTargets userId = async {
-    let user = Context.db.Users.FindOne(fun user -> user.Id = userId)
+let createDailyUserTargets (command: CreateUserDailyTargetsCommand) = async {
+    let user = Context.db.Users.FindOne(fun user -> user.Id = command.UserId)
 
     let proteinPerDay_grams = (Calculations.convertPoundsToKilograms user.Weight) * 1.2
     let proteinPerDay_calories = proteinPerDay_grams * 4.0
@@ -18,9 +20,9 @@ let createDailyUserTargets userId = async {
     let carbsPerDay_grams = carbsPerDay_calories / 4.0
 
     let userDailyTargets = {
-        Id = Guid.NewGuid();
-        UserId = userId;
-        Date = DateOnly.FromDateTime(DateTime.Now)
+        Id = Guid.NewGuid()
+        UserId = command.UserId
+        Date = command.Date
         MaintenanceCalories = maintenanceCalories
         ProteinGramsPerDay = proteinPerDay_grams
         FatGramsPerDay = fatPerDay_grams
@@ -28,15 +30,30 @@ let createDailyUserTargets userId = async {
     }
 
     Context.db.UserTargets.Insert userDailyTargets |> ignore
+
+    let q = Context.db.UserTargets.FindAll() |> List.ofSeq
+
+    let z = 4
+
+    ()
 }
 
-let fetchUserDailyTargets userId =
-    Context.db.UserTargets.Find(fun userTarget ->
-        userTarget.UserId = userId &&
-        userTarget.Date = DateOnly.FromDateTime(DateTime.Now))
-    |> List.ofSeq
-    |> List.tryExactlyOne
+let hasExactlyOneUserTargets (dailyUserTargets:UserTargets list) =
+    dailyUserTargets.Length = 1
+
+let fetchUserDailyTargets (query:GetDailyUserTargetsQuery) =
+    let dailyUserTargets = Context.db.UserTargets.Find(fun userTarget ->
+        userTarget.UserId = query.UserId &&
+        userTarget.Date = query.Date) |> List.ofSeq
+
+    if hasExactlyOneUserTargets dailyUserTargets
+    then Some dailyUserTargets.Head
+    else None
 
 let getDailyUserTargets (query:GetDailyUserTargetsQuery) = async {
-        return fetchUserDailyTargets query.UserId
+        return
+            fetchUserDailyTargets query
+            |> function
+               | Some userTargets -> Some userTargets
+               | None -> None
 }

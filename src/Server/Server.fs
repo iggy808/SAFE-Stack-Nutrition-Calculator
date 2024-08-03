@@ -3,11 +3,12 @@ module Server
 open SAFE
 open Saturn
 open Shared
+open Context
 
 let nutritionApi ctx = {
     // User Targets
     getDailyUserTargets = fun query -> Endpoints.UserTargets.getDailyUserTargets query
-    createDailyUserTargets = fun userId -> Endpoints.UserTargets.createDailyUserTargets userId
+    createDailyUserTargets = fun command -> Endpoints.UserTargets.createDailyUserTargets command
 
     // User
     getUser = fun _ -> Endpoints.User.getUser
