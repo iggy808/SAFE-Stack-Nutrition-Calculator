@@ -240,15 +240,35 @@ let dailyTargetsWidget (model: Model) dispatch =
             style.backgroundColor "#85B79D"
         ]
         prop.children [
-            Html.h2 [
-                prop.id "daily-targets-date"
-                prop.className "text-3xl font-bold p-4"
-                prop.text ("Targets - " + (DateOnly.FromDateTime(DateTime.Now).ToString()))
-                prop.style [
-                    style.color "#16302B"
-                    style.borderBottom (length.px 1, borderStyle.solid, "#16302B")
+            Html.div [
+                prop.className "flex flex-row"
+                prop.children [
+                    Html.h2 [
+                        prop.id "daily-targets-date"
+                        prop.className "text-3xl font-bold p-4 grow"
+                        prop.text ("Targets - " + (DateOnly.FromDateTime(DateTime.Now).ToString()))
+                        prop.style [
+                            style.color "#16302B"
+                            style.borderBottom (length.px 1, borderStyle.solid, "#16302B")
+                            //style.border (length.px 1, borderStyle.solid, "black")
+                        ]
+                    ]
+                    Html.button [
+                        prop.id "generate-targets-button p-4 grow"
+                        prop.className "font-bold"
+                        prop.text "Generate Targets"
+                        prop.style [
+                            style.color "#16302B"
+                            style.textDecoration.underline
+                            style.borderBottom (length.px 1, borderStyle.solid, "#16302B")
+                            //style.border (length.px 1, borderStyle.solid, "black")
+                        ]
+                        prop.onClick (fun _ ->
+                            // Show target generation confirmation modal
+                            (Browser.Dom.document.getElementById "generate-targets-confirmation-modal").style.display <- "block"
+                        )
+                    ]
                 ]
-
             ]
             Html.div [
                 prop.id "daily-targets-content"
@@ -618,3 +638,42 @@ let userWeightFormModal (model: Model) dispatch =
             ]
         ]
     ]
+
+let generateTargetsConfirmationModal =
+    Html.div [
+        prop.id "generate-targets-confirmation-modal"
+        // Dim website when modal is visible
+        prop.className "fixed h-full w-full hidden bg-gray-600/50 flex flex-col"
+        prop.children [
+            Html.div [
+                prop.className "relative mt-[75px] mx-auto p-5 w-1/4 h-3/8 shadow-lg rounded-full shadow-lg"
+                prop.style [style.backgroundColor "#E3D0D8"]
+                prop.children [
+                    Html.h3 [
+                        prop.className "text-2xl font-bold"
+                        prop.text "Generate Targets Confirmation"
+                        prop.style [style.color "#8C5F66"]
+                    ]
+                    Html.button [
+                        prop.text "Use current weight"
+                        prop.onClick (fun _ ->
+                            // Hide modal
+                            (Browser.Dom.document.getElementById "generate-targets-confirmation-modal").style.display <- "none"
+                        )
+                    ]
+                    Html.button [
+                        prop.text "Update weight"
+                        prop.onClick (fun _ ->
+                            // Hide modal
+                            (Browser.Dom.document.getElementById "generate-targets-confirmation-modal").style.display <- "none"
+
+                            // Show update weight modal
+                                                        // Hide modal
+                            (Browser.Dom.document.getElementById "update-user-weight-form-modal").style.display <- "block"
+                        )
+                    ]
+                ]
+            ]
+        ]
+    ]
+    

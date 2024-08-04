@@ -39,7 +39,7 @@ let view (model: Model) dispatch =
                 prop.children [
                     Html.div [
                         prop.id "dashboard-grid"
-                        prop.className "grid grid-cols-3 grid-rows-3 gap-4 grow"
+                        prop.className "grid grid-cols-3 grid-rows-3 gap-2 grow"
                         prop.style [
                             style.gridTemplateColumns [ length.fr 1; length.fr 2; length.fr 1; ]
                         ]
@@ -135,6 +135,8 @@ let view (model: Model) dispatch =
                     match targets with
                     | None -> (Browser.Dom.document.getElementById "update-user-weight-form-modal").style.display <- "block"
                     | Some targets -> ()
+
+            Components.generateTargetsConfirmationModal
             (*
             Html.div [
                 prop.className "flex flex-col items-center h-full"
