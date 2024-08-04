@@ -117,7 +117,6 @@ let view (model: Model) dispatch =
                 ]
             ]
             Components.userInformationFormModal model dispatch
-            Components.userWeightFormModal model dispatch
             match model.User with
                 | NotStarted -> ()
                 | Loading -> ()
@@ -126,6 +125,16 @@ let view (model: Model) dispatch =
                     match userInformation with
                     | None -> (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "block"
                     | Some user -> ()
+
+            Components.userWeightFormModal model dispatch
+            match model.Targets with
+                | NotStarted -> ()
+                | Loading -> ()
+                | Loaded targets ->
+                    // If no targets have been created for the day, prompt user to update weight before generating targets
+                    match targets with
+                    | None -> (Browser.Dom.document.getElementById "update-user-weight-form-modal").style.display <- "block"
+                    | Some targets -> ()
             (*
             Html.div [
                 prop.className "flex flex-col items-center h-full"
