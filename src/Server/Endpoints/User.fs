@@ -2,11 +2,11 @@ module Endpoints.User
 
 open Records
 
+// Todo: Add error handling
 let getUser = async {
     return
         Context.db.Users.FindAll()
-        |> List.ofSeq
-        |> List.tryExactlyOne
+        |> Seq.tryExactlyOne
 }
 
 let createUser (user:User) = async {
@@ -18,5 +18,9 @@ let createUser (user:User) = async {
 }
 
 let updateUserWeight command = async {
-    return ()
+    Context.db.Users.FindAll()
+    |> Seq.tryExactlyOne
+    |> function
+       | Some user -> Context.db.Users.Update user |> ignore
+       | None -> ()
 }

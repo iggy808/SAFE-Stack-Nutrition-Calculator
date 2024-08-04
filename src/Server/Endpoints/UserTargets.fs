@@ -1,10 +1,10 @@
 module Endpoints.UserTargets
 
 open Records
-open System
 open Queries
 open Commands
 
+// Todo: Add error handling
 let createDailyUserTargets (command: CreateUserDailyTargetsCommand) = async {
     Context.db.Users.FindOne(fun user -> user.Id = command.UserId)
     |> UserTargets.createDailyUserTargets

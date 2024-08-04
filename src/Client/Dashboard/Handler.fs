@@ -20,6 +20,11 @@ let init () =
 
     initialModel, initialCmd
 
+// Todo: Refactor daily target creation to be UI driven to prevent the spaghetti code below
+//       Ex/
+//          1. Add button to User Daily Targets widget that will generate targets
+//          2. Upon clickin the button, the user will be prompted with the update weight modal
+//              - Users may either update weight, or skip the update and use the weight currently in the user record
 let update msg model =
     match msg with
 
@@ -40,6 +45,19 @@ let update msg model =
             | None ->
                 { model with User = Loaded (user) },
                 Cmd.none
+
+    // Todo: Remove this when refactoring (details in Todo above update method)
+    | GetUpdatedUser msg ->
+        match msg with
+        | Start() ->
+            { model with User = Loading },
+            Cmd.OfAsync.perform
+                nutritionApi.getUser ()
+                (Finished >> GetUpdatedUser)
+
+        | Finished user ->
+            { model with User = Loaded (user) },
+            Cmd.none
 
     | CreateUser msg ->
         match msg with
@@ -78,21 +96,8 @@ let update msg model =
                 { model with Targets = Loaded (Some targets) },
                 Cmd.none
             | None ->
-                match model.User with
-                | NotStarted ->
-                    { model with Targets = NotStarted },
-                    Cmd.none
-                | Loading ->
-                    { model with Targets = NotStarted },
-                    Cmd.none
-                | Loaded user ->
-                    match user with
-                    | Some user ->
-                        { model with Targets = Loading },
-                        (CreateUserTargets(Start(Some user.Id))) |> Cmd.ofMsg
-                    | None ->
-                        { model with Targets = NotStarted },
-                        Cmd.none
+                { model with Targets = Loaded (None) },
+                Cmd.none
 
     | CreateUserTargets msg ->
         match msg with
@@ -133,7 +138,12 @@ let update msg model =
                 Cmd.none
 
         | Finished _ ->
-            model,
-            Cmd.OfAsync.perform
-                nutritionApi.getUser ()
-                (Finished >> GetUser)
+            match model.User with
+            | NotStarted -> model, Cmd.none
+            | Loading -> model, Cmd.none
+            | Loaded user ->
+                match user with
+                | None -> model, Cmd.none
+                | Some user ->
+                    { model with Targets = Loading },
+                    (CreateUserTargets(Start(Some user.Id))) |> Cmd.ofMsg
