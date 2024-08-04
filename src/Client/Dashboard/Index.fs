@@ -39,9 +39,9 @@ let view (model: Model) dispatch =
                 prop.children [
                     Html.div [
                         prop.id "dashboard-grid"
-                        prop.className "grid grid-cols-3 grid-rows-3 gap-4"
+                        prop.className "grid grid-cols-3 grid-rows-3 gap-4 grow"
                         prop.style [
-                            style.flexGrow 1
+                            style.gridTemplateColumns [ length.fr 1; length.fr 2; length.fr 1; ]
                         ]
                         prop.children [
                             Html.div [
