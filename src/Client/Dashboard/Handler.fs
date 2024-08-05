@@ -20,11 +20,6 @@ let init () =
 
     initialModel, initialCmd
 
-// Todo: Refactor daily target creation to be UI driven to prevent the spaghetti code below
-//       Ex/
-//          1. Add button to User Daily Targets widget that will generate targets
-//          2. Upon clickin the button, the user will be prompted with the update weight modal
-//              - Users may either update weight, or skip the update and use the weight currently in the user record
 let update msg model =
     match msg with
 
