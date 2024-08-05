@@ -148,6 +148,7 @@ let update msg model =
                         Date = DateOnly.FromDateTime(DateTime.Now)
                     }))) |> Cmd.ofMsg
 
+    // Called when updating user weight
     | DeleteCurrentDayUserTargets msg ->
         match msg with
         | Start command ->
@@ -156,6 +157,9 @@ let update msg model =
                 nutritionApi.deleteUserTargetsByDate command
                 (Finished >> DeleteCurrentDayUserTargets)
 
+        // Getting user serves two purposes:
+        //  1. To retrieve updated user data and post on User Information Widget
+        //  2. To trigger a fetch and creation of new user target data with the updated weight
         | Finished _ ->
             { model with Targets = NotStarted },
             (GetUser(Start())) |> Cmd.ofMsg
