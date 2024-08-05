@@ -1,6 +1,7 @@
 module Endpoints.User
 
 open Records
+open Commands
 
 // Todo: Add error handling
 let getUser = async {
@@ -17,10 +18,13 @@ let createUser (user:User) = async {
         | false -> ()
 }
 
-let updateUserWeight command = async {
+let updateUserWeight (command:UpdateUserWeightCommand) = async {
     Context.db.Users.FindAll()
     |> Seq.tryExactlyOne
     |> function
-       | Some user -> Context.db.Users.Update user |> ignore
+       | Some user ->
+            { user with Weight = command.Weight }
+            |> Context.db.Users.Update
+            |> ignore
        | None -> ()
 }

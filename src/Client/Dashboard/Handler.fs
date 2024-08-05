@@ -40,24 +40,15 @@ let update msg model =
             match user with
             | Some user ->
                 { model with User = Loaded (Some user) },
-                GetUserTargets(Start(Some user.Id)) |> Cmd.ofMsg
+                (GetCurrentDayUserTargets(Start({
+                    UserId = user.Id;
+                    Date = DateOnly.FromDateTime(DateTime.Now)
+                })))
+                |> Cmd.ofMsg
 
             | None ->
                 { model with User = Loaded (user) },
                 Cmd.none
-
-    // Todo: Remove this when refactoring (details in Todo above update method)
-    | GetUpdatedUser msg ->
-        match msg with
-        | Start() ->
-            { model with User = Loading },
-            Cmd.OfAsync.perform
-                nutritionApi.getUser ()
-                (Finished >> GetUpdatedUser)
-
-        | Finished user ->
-            { model with User = Loaded (user) },
-            Cmd.none
 
     | CreateUser msg ->
         match msg with
@@ -73,22 +64,13 @@ let update msg model =
                 nutritionApi.getUser ()
                 (Finished >> GetUser)
 
-    | SetInput value -> { model with Input = value }, Cmd.none
-
-    | GetUserTargets msg ->
+    | GetCurrentDayUserTargets msg ->
         match msg with
-        | Start userId ->
-            match userId with
-            | Some userId ->
-                { model with Targets = Loading },
-                Cmd.OfAsync.perform
-                    nutritionApi.getDailyUserTargets {
-                        UserId = userId
-                        Date = DateOnly.FromDateTime(DateTime.Now)
-                    }
-                    (Finished >> GetUserTargets)
-
-            | None -> { model with Targets = NotStarted }, Cmd.none
+        | Start query ->
+            { model with Targets = Loading },
+            Cmd.OfAsync.perform
+                nutritionApi.getUserTargetsByDate query
+                (Finished >> GetCurrentDayUserTargets)
 
         | Finished targets ->
             match targets with
@@ -96,21 +78,33 @@ let update msg model =
                 { model with Targets = Loaded (Some targets) },
                 Cmd.none
             | None ->
-                { model with Targets = Loaded (None) },
-                Cmd.none
+                // If no targets exist for the current day, create them
+                let userId =
+                    match model.User with
+                    | NotStarted -> None
+                    | Loading -> None
+                    | Loaded user ->
+                        match user with
+                        | Some user -> Some user.Id
+                        | None -> None
 
-    | CreateUserTargets msg ->
+                { model with Targets = Loaded (None) },
+                match userId with
+                | Some userId ->
+                    (CreateCurrentDayUserTargets(Start({
+                        UserId = userId;
+                        Date = DateOnly.FromDateTime(DateTime.Now)
+                    })))
+                    |> Cmd.ofMsg
+                | None -> Cmd.none
+
+    | CreateCurrentDayUserTargets msg ->
         match msg with
-        | Start userId ->
-            match userId with
-            | Some userId ->
-                { model with Targets = Loading },
-                Cmd.OfAsync.perform
-                    nutritionApi.createDailyUserTargets { UserId = userId; Date = DateOnly.FromDateTime(DateTime.Now) }
-                    (Finished >> CreateUserTargets)
-            | None ->
-                model,
-                Cmd.none
+        | Start command ->
+            { model with Targets = NotStarted },
+            Cmd.OfAsync.perform
+                nutritionApi.createUserTargets command
+                (Finished >> CreateCurrentDayUserTargets)
 
         | Finished _ ->
             match model.User with
@@ -119,8 +113,12 @@ let update msg model =
             | Loaded user ->
                 match user with
                 | Some user ->
-                    { model with Targets = Loading },
-                    (GetUserTargets(Start(Some user.Id))) |> Cmd.ofMsg
+                    { model with Targets = NotStarted },
+                    (GetCurrentDayUserTargets(Start({
+                        UserId = user.Id;
+                        Date = DateOnly.FromDateTime(DateTime.Now)
+                    })))
+                    |> Cmd.ofMsg
                 | None -> { model with Targets = NotStarted }, Cmd.none
 
     | UpdateUserWeight msg ->
@@ -132,7 +130,6 @@ let update msg model =
                 Cmd.OfAsync.perform
                     nutritionApi.updateUserWeight command
                     (Finished >> UpdateUserWeight)
-
             | None ->
                 model,
                 Cmd.none
@@ -145,5 +142,21 @@ let update msg model =
                 match user with
                 | None -> model, Cmd.none
                 | Some user ->
-                    { model with Targets = Loading },
-                    (CreateUserTargets(Start(Some user.Id))) |> Cmd.ofMsg
+                    { model with Targets = NotStarted },
+                    (DeleteCurrentDayUserTargets(Start({
+                        UserId = user.Id
+                        Date = DateOnly.FromDateTime(DateTime.Now)
+                    }))) |> Cmd.ofMsg
+
+    | DeleteCurrentDayUserTargets msg ->
+        match msg with
+        | Start command ->
+            { model with Targets = NotStarted },
+            Cmd.OfAsync.perform
+                nutritionApi.deleteUserTargetsByDate command
+                (Finished >> DeleteCurrentDayUserTargets)
+
+        | Finished _ ->
+            { model with Targets = NotStarted },
+            (GetUser(Start())) |> Cmd.ofMsg
+                

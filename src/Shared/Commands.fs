@@ -7,7 +7,12 @@ type UpdateUserWeightCommand = {
     Weight : float
 }
 
-type CreateUserDailyTargetsCommand = {
+type CreateUserTargetsCommand = {
     UserId : Guid
-    Date: DateOnly
+    Date : DateOnly
+}
+
+type DeleteUserTargetsByDateCommand = {
+    UserId : Guid
+    Date : DateOnly
 }

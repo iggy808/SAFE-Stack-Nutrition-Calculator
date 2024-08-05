@@ -6,8 +6,9 @@ open Shared
 
 let nutritionApi ctx = {
     // User Targets
-    getDailyUserTargets = fun query -> Endpoints.UserTargets.getDailyUserTargets query
-    createDailyUserTargets = fun command -> Endpoints.UserTargets.createDailyUserTargets command
+    getUserTargetsByDate = fun query -> Endpoints.UserTargets.getUserTargetsByDate query
+    createUserTargets = fun command -> Endpoints.UserTargets.createUserTargets command
+    deleteUserTargetsByDate = fun command -> Endpoints.UserTargets.deleteUserTargetsByDate command
 
     // User
     getUser = fun _ -> Endpoints.User.getUser

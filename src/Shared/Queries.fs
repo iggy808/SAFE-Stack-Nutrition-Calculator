@@ -2,7 +2,7 @@ namespace Queries
 
 open System
 
-type GetDailyUserTargetsQuery = {
+type GetUserTargetsByDateQuery = {
     UserId:Guid
     Date:DateOnly
 }

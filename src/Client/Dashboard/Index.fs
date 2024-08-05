@@ -120,23 +120,13 @@ let view (model: Model) dispatch =
             match model.User with
                 | NotStarted -> ()
                 | Loading -> ()
-                | Loaded userInformation ->
+                | Loaded user ->
                     // If no user exists within the database, display the Create User modal
-                    match userInformation with
+                    match user with
                     | None -> (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "block"
                     | Some user -> ()
 
             Components.userWeightFormModal model dispatch
-            match model.Targets with
-                | NotStarted -> ()
-                | Loading -> ()
-                | Loaded targets ->
-                    // If no targets have been created for the day, prompt user to update weight before generating targets
-                    match targets with
-                    | None -> (Browser.Dom.document.getElementById "update-user-weight-form-modal").style.display <- "block"
-                    | Some targets -> ()
-
-            Components.generateTargetsConfirmationModal
             (*
             Html.div [
                 prop.className "flex flex-col items-center h-full"
