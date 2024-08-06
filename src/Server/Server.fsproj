@@ -6,6 +6,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Validation.fs" />
     <Compile Include="Context.fs" />
     <Compile Include="Calculations.fs" />
     <Compile Include="Endpoints\User.fs" />
