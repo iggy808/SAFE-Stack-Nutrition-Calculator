@@ -67,31 +67,42 @@ let update msg model =
                 nutritionApi.getUserTargetsByDate query
                 (Finished >> GetCurrentDayUserTargets)
 
-        | Finished targets ->
-            match targets with
-            | Some targets ->
-                { model with Targets = Loaded (Some targets) },
-                Cmd.none
-            | None ->
-                // If no targets exist for the current day, create them
-                let userId =
-                    match model.User with
-                    | NotStarted -> None
-                    | Loading -> None
-                    | Loaded user ->
-                        match user with
-                        | Some user -> Some user.Id
-                        | None -> None
+        | Finished result ->
+            match result with
+            | Ok targets ->
+                match targets with
+                | Some targets ->
+                    { model with Targets = Loaded (Some targets) },
+                    Cmd.none
+                | None ->
+                    // If no targets exist for the current day, create them
+                    let userId =
+                        match model.User with
+                        | NotStarted -> None
+                        | Loading -> None
+                        | Loaded user ->
+                            match user with
+                            | Some user -> Some user.Id
+                            | None -> None
 
+                    let command =
+                        match userId with
+                        | Some userId ->
+                            (CreateCurrentDayUserTargets(Start({
+                                UserId = userId;
+                                Date = DateOnly.FromDateTime(DateTime.Now)
+                            })))
+                            |> Cmd.ofMsg
+                        | None -> Cmd.none
+
+                    { model with Targets = Loaded (None) },
+                    command
+
+            | Error message ->
+                // If there was an server error while getting user targets, log it.
+                Browser.Dom.console.log message
                 { model with Targets = Loaded (None) },
-                match userId with
-                | Some userId ->
-                    (CreateCurrentDayUserTargets(Start({
-                        UserId = userId;
-                        Date = DateOnly.FromDateTime(DateTime.Now)
-                    })))
-                    |> Cmd.ofMsg
-                | None -> Cmd.none
+                Cmd.none
 
     | CreateCurrentDayUserTargets msg ->
         match msg with
@@ -154,8 +165,13 @@ let update msg model =
 
         // Getting user serves two purposes:
         //  1. To retrieve updated user data and post on User Information Widget
-        //  2. To trigger a fetch and creation of new user target data with the updated weight
-        | Finished _ ->
+        //  2. To trigger a fetch and subsequent creation of new user target data with the updated weight
+        | Finished result ->
+            // If there was an server error while deleting the user targets, log it.
+            match result with
+            | Error message -> Browser.Dom.console.log message
+            | Ok _ -> ()
+
             { model with Targets = NotStarted },
             (GetUser(Start())) |> Cmd.ofMsg
                 

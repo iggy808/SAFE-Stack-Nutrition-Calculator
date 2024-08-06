@@ -6,9 +6,26 @@ open Shared
 
 let nutritionApi ctx = {
     // User Targets
-    getUserTargetsByDate = fun query -> Endpoints.UserTargets.getUserTargetsByDate query
-    createUserTargets = fun command -> Endpoints.UserTargets.createUserTargets command
-    deleteUserTargetsByDate = fun command -> Endpoints.UserTargets.deleteUserTargetsByDate command
+    getUserTargetsByDate = fun query -> async {
+        return Validation.validateGetUserTargetsByDateQuery query
+        |> function
+           | true -> Endpoints.UserTargets.getUserTargetsByDate query
+           | false -> Error "Get user targets by date query is invalid."
+    }
+    createUserTargets = fun command -> async {
+        return
+            Validation.validateCreateUserTargetsCommand command
+            |> function
+               | true -> Endpoints.UserTargets.createUserTargets command
+               | false -> Error "Create user targets command is invalid."
+    }
+    deleteUserTargetsByDate = fun command -> async {
+            return
+                Validation.validateDeleteUserTargetsByDateCommand command
+                |> function
+                   | true -> Endpoints.UserTargets.deleteUserTargetsByDate command
+                   | false -> Error "Delete user targets command is invalid."
+    }
 
     // User
     getUser = fun _ -> Endpoints.User.getUser
