@@ -28,7 +28,10 @@ let nutritionApi ctx = {
     }
 
     // User
-    getUser = fun _ -> Endpoints.User.getUser
+    getUser = fun _ -> async {
+        return
+            Endpoints.User.getUser
+    }
     createUser = fun command -> async {
         return
             Validation.validateCreateUserCommand command

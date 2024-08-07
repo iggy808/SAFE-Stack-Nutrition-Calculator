@@ -107,7 +107,6 @@ let update msg model =
 
             // Todo: Update program flow after error encountered here.
             | Error message ->
-                // If there was an server error while getting user targets, log it.
                 Browser.Dom.console.log message
                 { model with Targets = Loaded (None) },
                 Cmd.none

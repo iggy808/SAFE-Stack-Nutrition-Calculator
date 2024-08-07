@@ -3,12 +3,9 @@ module Endpoints.User
 open Records
 open Commands
 
-// Todo: Add error handling
-let getUser = async {
-    return
-        Context.db.Users.FindAll()
-        |> Seq.tryExactlyOne
-}
+let getUser =
+    Context.db.Users.FindAll()
+    |> Seq.tryExactlyOne
 
 let createUser (user:User) =
     Context.db.Users.Insert user
