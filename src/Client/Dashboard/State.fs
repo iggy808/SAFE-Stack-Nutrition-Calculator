@@ -2,7 +2,6 @@ module Dashboard.State
 
 open Records
 open SAFE
-open System
 open Commands
 open Queries
 

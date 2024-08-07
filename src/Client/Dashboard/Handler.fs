@@ -53,11 +53,18 @@ let update msg model =
                 nutritionApi.createUser user
                 (Finished >> CreateUser)
 
-        | Finished _ ->
-            { model with User = Loading },
-            Cmd.OfAsync.perform
-                nutritionApi.getUser ()
-                (Finished >> GetUser)
+        | Finished result ->
+            match result with
+            | Ok () ->
+                { model with User = Loading },
+                Cmd.OfAsync.perform
+                    nutritionApi.getUser ()
+                    (Finished >> GetUser)
+
+            | Error message ->
+                Browser.Dom.console.log message
+                { model with User = Loaded (None) },
+                Cmd.none
 
     | GetCurrentDayUserTargets msg ->
         match msg with
