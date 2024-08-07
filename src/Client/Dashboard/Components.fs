@@ -618,7 +618,7 @@ let userWeightFormModal (model: Model) dispatch =
 
                                             // Collect updated user weight from form
                                             let userWeight = (Browser.Dom.document.getElementById "update-user-weight-form-element").getAttribute "value" |> float
-                                                
+
                                             dispatch (UpdateUserWeight(Start(
                                                match model.User with
                                                | NotStarted -> None

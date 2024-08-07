@@ -98,6 +98,7 @@ let update msg model =
                     { model with Targets = Loaded (None) },
                     command
 
+            // Todo: Update program flow after error encountered here.
             | Error message ->
                 // If there was an server error while getting user targets, log it.
                 Browser.Dom.console.log message
@@ -112,20 +113,28 @@ let update msg model =
                 nutritionApi.createUserTargets command
                 (Finished >> CreateCurrentDayUserTargets)
 
-        | Finished _ ->
-            match model.User with
-            | NotStarted -> { model with Targets = NotStarted }, Cmd.none
-            | Loading -> { model with Targets = NotStarted }, Cmd.none
-            | Loaded user ->
-                match user with
-                | Some user ->
-                    { model with Targets = NotStarted },
-                    (GetCurrentDayUserTargets(Start({
-                        UserId = user.Id;
-                        Date = DateOnly.FromDateTime(DateTime.Now)
-                    })))
-                    |> Cmd.ofMsg
-                | None -> { model with Targets = NotStarted }, Cmd.none
+        | Finished result ->
+            match result with
+            | Ok () ->
+                match model.User with
+                | NotStarted -> { model with Targets = NotStarted }, Cmd.none
+                | Loading -> { model with Targets = NotStarted }, Cmd.none
+                | Loaded user ->
+                    match user with
+                    | Some user ->
+                        { model with Targets = NotStarted },
+                        (GetCurrentDayUserTargets(Start({
+                            UserId = user.Id;
+                            Date = DateOnly.FromDateTime(DateTime.Now)
+                        })))
+                        |> Cmd.ofMsg
+                    | None -> { model with Targets = NotStarted }, Cmd.none
+
+            // Todo: Update program flow after error encountered here.
+            | Error message ->
+                Browser.Dom.console.log message
+                model,
+                Cmd.none
 
     | UpdateUserWeight msg ->
         match msg with
@@ -140,19 +149,27 @@ let update msg model =
                 model,
                 Cmd.none
 
-        | Finished _ ->
-            match model.User with
-            | NotStarted -> model, Cmd.none
-            | Loading -> model, Cmd.none
-            | Loaded user ->
-                match user with
-                | None -> model, Cmd.none
-                | Some user ->
-                    { model with Targets = NotStarted },
-                    (DeleteCurrentDayUserTargets(Start({
-                        UserId = user.Id
-                        Date = DateOnly.FromDateTime(DateTime.Now)
-                    }))) |> Cmd.ofMsg
+        | Finished result ->
+            match result with
+            | Ok () ->
+                match model.User with
+                | NotStarted -> model, Cmd.none
+                | Loading -> model, Cmd.none
+                | Loaded user ->
+                    match user with
+                    | None -> model, Cmd.none
+                    | Some user ->
+                        { model with Targets = NotStarted },
+                        (DeleteCurrentDayUserTargets(Start({
+                            UserId = user.Id
+                            Date = DateOnly.FromDateTime(DateTime.Now)
+                        }))) |> Cmd.ofMsg
+
+            // Todo: Update program flow after error encountered here.
+            | Error message ->
+                Browser.Dom.console.log message
+                model,
+                Cmd.none
 
     // Called when updating user weight
     | DeleteCurrentDayUserTargets msg ->

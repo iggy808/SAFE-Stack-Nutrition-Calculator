@@ -16,8 +16,8 @@ type Model = {
 type Msg =
     | SetInput of string
     | GetUser of ApiCall<unit, User option>
-    | CreateUser of ApiCall<User, unit>
-    | UpdateUserWeight of ApiCall<UpdateUserWeightCommand option, unit> // does this need to be option?
+    | CreateUser of ApiCall<User, Result<unit, string>>
+    | UpdateUserWeight of ApiCall<UpdateUserWeightCommand option, Result<unit, string>>
     | GetCurrentDayUserTargets of ApiCall<GetUserTargetsByDateQuery, Result<UserTargets option,string>>
     | CreateCurrentDayUserTargets of ApiCall<CreateUserTargetsCommand, Result<unit, string>>
     | DeleteCurrentDayUserTargets of ApiCall<DeleteUserTargetsByDateCommand, Result<unit, string>>

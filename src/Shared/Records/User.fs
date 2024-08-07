@@ -19,6 +19,7 @@ module User =
     let isActivityFactorWithinValidRange activityFactor = activityFactor > 0.0 && activityFactor < 3.0
 
     let isValid (user:User) =
+        user.Id <> Guid.Empty &&
         user.Name |> isNameValid &&
         user.Age |> isAgeWithinValidRange &&
         user.Height |> isHeightWithinValidRange &&

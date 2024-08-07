@@ -19,8 +19,8 @@ module Todo =
 
 type INutritionApi = {
     getUser: unit -> Async<User option>
-    createUser: User -> Async<unit>
-    updateUserWeight: UpdateUserWeightCommand -> Async<unit>
+    createUser: User -> Async<Result<unit, string>>
+    updateUserWeight: UpdateUserWeightCommand -> Async<Result<unit, string>>
     getUserTargetsByDate: GetUserTargetsByDateQuery -> Async<Result<UserTargets option, string>>
     createUserTargets: CreateUserTargetsCommand -> Async<Result<unit, string>>
     deleteUserTargetsByDate: DeleteUserTargetsByDateCommand -> Async<Result<unit,string>>

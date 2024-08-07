@@ -10,15 +10,12 @@ let getUser = async {
         |> Seq.tryExactlyOne
 }
 
-let createUser (user:User) = async {
-    user
-    |> User.isValid
-    |> function
-        | true -> Context.db.Users.Insert user |> ignore
-        | false -> ()
-}
+let createUser (user:User) =
+    Context.db.Users.Insert user
+    |> ignore
+    |> Ok
 
-let updateUserWeight (command:UpdateUserWeightCommand) = async {
+let updateUserWeight (command:UpdateUserWeightCommand) =
     Context.db.Users.FindAll()
     |> Seq.tryExactlyOne
     |> function
@@ -26,5 +23,5 @@ let updateUserWeight (command:UpdateUserWeightCommand) = async {
             { user with Weight = command.Weight }
             |> Context.db.Users.Update
             |> ignore
-       | None -> ()
-}
+            |> Ok
+       | None -> Error "No users exist within the database, or more than one user exist within the database."

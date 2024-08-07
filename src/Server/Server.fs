@@ -29,8 +29,20 @@ let nutritionApi ctx = {
 
     // User
     getUser = fun _ -> Endpoints.User.getUser
-    createUser = fun user -> Endpoints.User.createUser user
-    updateUserWeight = fun command -> Endpoints.User.updateUserWeight command
+    createUser = fun command -> async {
+        return
+            Validation.validateCreateUserCommand command
+            |> function
+               | true -> Endpoints.User.createUser command
+               | false -> Error "User data is invalid."
+    }
+    updateUserWeight = fun command -> async {
+        return
+            Validation.validateUpdateUserWeightCommand command
+            |> function
+               | true -> Endpoints.User.updateUserWeight command
+               | false -> Error "Update user weight command is invalid."
+    }
 }
 
 let webApp = Api.make nutritionApi
