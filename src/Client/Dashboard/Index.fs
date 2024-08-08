@@ -5,8 +5,6 @@ open Dashboard.State
 open SAFE
 open Browser.CssExtensions
 open Feliz
-open Fable.Core
-open Fable.Core.JsInterop
 
 let view (model: Model) dispatch =
     Html.div [

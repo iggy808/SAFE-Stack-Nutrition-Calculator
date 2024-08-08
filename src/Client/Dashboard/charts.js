@@ -11,11 +11,6 @@ export function initChart () {
         { year: 2016, count: 28 },
     ];
 
-    let ctx = document.getElementById('weight-chart-container');
-    console.log('ahhhhhhhhh');
-    console.log(ctx);
-    console.log('ahhhhhhhhh');
-
     new Chart(
         document.getElementById('weight-chart-container'),
         {
