@@ -7,8 +7,11 @@ open SAFE
 open Shared
 open System
 open Records
+open Fable.Core.JsInterop
 
 let nutritionApi = Api.makeProxy<INutritionApi> ()
+
+let initBarChart : unit -> unit = import "initChart" "./charts.js"
 
 let init () =
     let initialModel = {
@@ -17,7 +20,6 @@ let init () =
         Targets = NotStarted;
         Input = "" }
     let initialCmd = GetUser(Start()) |> Cmd.ofMsg
-
     initialModel, initialCmd
 
 let update msg model =
@@ -32,6 +34,7 @@ let update msg model =
                 (Finished >> GetUser)
 
         | Finished user ->
+            initBarChart()
             match user with
             | Some user ->
                 { model with User = Loaded (Some user) },

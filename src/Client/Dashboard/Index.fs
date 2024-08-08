@@ -5,6 +5,8 @@ open Dashboard.State
 open SAFE
 open Browser.CssExtensions
 open Feliz
+open Fable.Core
+open Fable.Core.JsInterop
 
 let view (model: Model) dispatch =
     Html.div [
@@ -55,8 +57,8 @@ let view (model: Model) dispatch =
                                 prop.className "flex items-center justify-center"
                                 prop.style [style.backgroundColor "#85B79D"]
                                 prop.children [
-                                    Html.p [
-                                        prop.text 2
+                                    Html.canvas [
+                                        prop.id "weight-chart-container"
                                     ]
                                 ]
                             ]

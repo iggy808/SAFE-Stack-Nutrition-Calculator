@@ -19,6 +19,7 @@ let updateUserWeight (command:UpdateUserWeightCommand) =
        | Some user ->
             { user with Weight = command.Weight }
             |> Context.db.Users.Update
-            |> ignore
-            |> Ok
+            |> function
+               | true -> Ok ()
+               | false -> Error "Target user not found within database."
        | None -> Error "No users exist within the database, or more than one user exist within the database."
