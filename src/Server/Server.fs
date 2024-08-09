@@ -3,6 +3,7 @@ module Server
 open SAFE
 open Saturn
 open Shared
+open System
 
 let nutritionApi ctx = {
     // User Targets
@@ -45,6 +46,14 @@ let nutritionApi ctx = {
             |> function
                | true -> Endpoints.User.updateUserWeight command
                | false -> Error "Update user weight command is invalid."
+    }
+
+    getUserWeightHistory = fun query -> async {
+        return
+            Validation.validateGetUserWeightHistoryQuery query
+            |> function
+               | true -> Endpoints.UserTargets.getUserWeightHistory query
+               | false -> Error "Get user weight history query is invalid."
     }
 }
 

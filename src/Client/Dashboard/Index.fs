@@ -124,7 +124,7 @@ let view (model: Model) dispatch =
                     // If no user exists within the database, display the Create User modal
                     match user with
                     | None -> (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "block"
-                    | Some user -> ()
+                    | Some user -> (Browser.Dom.document.getElementById "user-information-form-modal").style.display <- "none"
 
             Components.userWeightFormModal model dispatch
             (*

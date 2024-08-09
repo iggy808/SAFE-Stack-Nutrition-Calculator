@@ -24,4 +24,5 @@ type INutritionApi = {
     getUserTargetsByDate: GetUserTargetsByDateQuery -> Async<Result<UserTargets option, string>>
     createUserTargets: CreateUserTargetsCommand -> Async<Result<unit, string>>
     deleteUserTargetsByDate: DeleteUserTargetsByDateCommand -> Async<Result<unit,string>>
+    getUserWeightHistory: GetUserWeightHistoryQuery -> Async<Result<UserWeightHistory list, string>>
 }

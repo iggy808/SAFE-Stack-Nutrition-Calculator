@@ -11,14 +11,16 @@ open Fable.Core.JsInterop
 
 let nutritionApi = Api.makeProxy<INutritionApi> ()
 
-let initBarChart : unit -> unit = import "initChart" "./charts.js"
+let initBarChart : UserWeightHistory list -> unit = import "initChart" "./charts.js"
 
 let init () =
     let initialModel = {
         User = NotStarted;
-        UserDto = None
         Targets = NotStarted;
-        Input = "" }
+        UserWeightHistory = NotStarted;
+        UserDto = None;
+        Input = "";
+    }
     let initialCmd = GetUser(Start()) |> Cmd.ofMsg
     initialModel, initialCmd
 
@@ -34,7 +36,6 @@ let update msg model =
                 (Finished >> GetUser)
 
         | Finished user ->
-            initBarChart()
             match user with
             | Some user ->
                 { model with User = Loaded (Some user) },
@@ -82,8 +83,25 @@ let update msg model =
             | Ok targets ->
                 match targets with
                 | Some targets ->
+
+                    let userId = 
+                        match model.User with
+                        | NotStarted -> None
+                        | Loading -> None
+                        | Loaded user ->
+                            match user with
+                            | Some user -> Some user.Id
+                            | None -> None
+
+                    let command =
+                        match userId with
+                        | Some userId -> (GetUserWeightHistory(Start({UserId = userId}))) |> Cmd.ofMsg
+                        | None -> Cmd.none
+
                     { model with Targets = Loaded (Some targets) },
-                    Cmd.none
+                    command
+                    
+
                 | None ->
                     // If no targets exist for the current day, create them
                     let userId =
@@ -200,4 +218,24 @@ let update msg model =
 
             { model with Targets = NotStarted },
             (GetUser(Start())) |> Cmd.ofMsg
+
+    | GetUserWeightHistory msg ->
+        match msg with
+        | Start query ->
+
+            { model with UserWeightHistory = Loading },
+            Cmd.OfAsync.perform
+                nutritionApi.getUserWeightHistory query
+                (Finished >> GetUserWeightHistory)
+
+        | Finished result ->
+            match result with
+            | Error message ->
+                Browser.Dom.console.log message
+                { model with UserWeightHistory = NotStarted },
+                Cmd.none
+            | Ok userWeightHistory ->
+                initBarChart userWeightHistory
+                { model with UserWeightHistory = Loaded (userWeightHistory) },
+                Cmd.none
                 

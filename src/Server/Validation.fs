@@ -20,3 +20,6 @@ let validateCreateUserCommand (command:User) =
 let validateUpdateUserWeightCommand (command:UpdateUserWeightCommand) =
     command.UserId <> Guid.Empty &&
     User.isWeightWithinValidRange command.Weight
+
+let validateGetUserWeightHistoryQuery (query:GetUserWeightHistoryQuery) =
+    query.UserId <> Guid.Empty

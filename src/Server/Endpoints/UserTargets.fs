@@ -31,3 +31,10 @@ let deleteUserTargetsByDate (command: DeleteUserTargetsByDateCommand) =
         userTargets.UserId = command.UserId &&
         userTargets.Date = (command.Date |> string))
     |> verifyUserTargetsDeleted
+
+let getUserWeightHistory (query:GetUserWeightHistoryQuery) =
+    Context.db.UserTargets.Find(fun userTargets ->
+        userTargets.UserId = query.UserId)
+    |> Seq.map (fun userTargets -> { Date = DateOnly.Parse userTargets.Date; Weight = userTargets.CurrentWeight; })
+    |> List.ofSeq
+    |> Ok

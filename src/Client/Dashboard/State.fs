@@ -7,8 +7,9 @@ open Queries
 
 type Model = {
     User: RemoteData<User option>
-    UserDto: User option
     Targets: RemoteData<UserTargets option>
+    UserWeightHistory: RemoteData<UserWeightHistory list>
+    UserDto: User option
     Input: string
 }
 
@@ -20,3 +21,4 @@ type Msg =
     | GetCurrentDayUserTargets of ApiCall<GetUserTargetsByDateQuery, Result<UserTargets option,string>>
     | CreateCurrentDayUserTargets of ApiCall<CreateUserTargetsCommand, Result<unit, string>>
     | DeleteCurrentDayUserTargets of ApiCall<DeleteUserTargetsByDateCommand, Result<unit, string>>
+    | GetUserWeightHistory of ApiCall<GetUserWeightHistoryQuery, Result<UserWeightHistory list, string>>

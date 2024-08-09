@@ -6,6 +6,7 @@ type UserTargets = {
     Id: Guid
     UserId:Guid
     Date: string // Date cannot be stored as DateOnly within LiteDB / Bson
+    CurrentWeight: float
     MaintenanceCalories: float
     ProteinGramsPerDay: float
     FatGramsPerDay: float
@@ -31,6 +32,7 @@ module UserTargets =
             Id = Guid.NewGuid()
             UserId = user.Id
             Date = DateOnly.FromDateTime(DateTime.Now) |> string
+            CurrentWeight = user.Weight
             MaintenanceCalories = maintenanceCalories
             ProteinGramsPerDay = proteinPerDay_grams
             FatGramsPerDay = fatPerDay_grams

@@ -1,6 +1,8 @@
 import Chart from "chart.js/auto";
 
-export function initChart () {
+// userWeightHistory : (DateOnly * float) = (Date, Weight)
+export function initChart(userWeightHistory) {
+    
     const data = [
         { year: 2010, count: 10 },
         { year: 2011, count: 20 },
@@ -11,16 +13,23 @@ export function initChart () {
         { year: 2016, count: 28 },
     ];
 
+    console.log(userWeightHistory);
+
+    const weightHistory = [
+        { Date: userWeightHistory.head.Date, Weight: userWeightHistory.head.Weight }
+    ];
+    console.log(weightHistory);
+
     new Chart(
         document.getElementById('weight-chart-container'),
         {
-            type: 'bar',
+            type: 'line',
             data: {
-                labels: data.map(row => row.year),
+                labels: weightHistory.map(row => row.Date),
                 datasets: [
                     {
-                        label: 'Acquisitions by year',
-                        data: data.map(row => row.count)
+                        label: 'Weight by day',
+                        data: weightHistory.map(row => row.Weight)
                     }
                 ]
             }

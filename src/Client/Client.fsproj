@@ -5,6 +5,7 @@
         <DefineConstants>FABLE_COMPILER</DefineConstants>
     </PropertyGroup>
     <ItemGroup>
+        <None Include="dashboard\charts.js" />
         <Compile Include="Dashboard\State.fs" />
         <Compile Include="Dashboard\Components.fs" />
         <Compile Include="Dashboard\Index.fs" />
